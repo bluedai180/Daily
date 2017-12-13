@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Daily</title>
+</head>
+<body>
+    <script src="login.js"></script>
+    <script src="http://cdn.bootcss.com/blueimp-md5/1.1.0/js/md5.js"></script>
+    <p>This is daily report for app team.</p>
+    <form id="login-form" method="post" onsubmit="return checkForm()">
+        Username: <input type="text" id="username" name="username"><br>
+        Password: <input type="password" id="input-password"><br>
+        <input type="hidden" id="md5-password" name="password">
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>
