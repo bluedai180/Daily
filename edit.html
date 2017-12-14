@@ -5,18 +5,113 @@
     <title>Daily</title>
 </head>
 <body>
-    <h4>前三天：</h4>
-    <table border="1">
+<h4>前三天：</h4>
+<table id="last" border="1">
     <tr>
-        <th>姓名</th>
-        <th>电话</th>
-        <th>电话</th>
+        <th>项目</th>
+        <th>工作类型</th>
+        <th>Bug ID</th>
+        <th>简要描述</th>
+        <th>优先级</th>
+        <th>是否reopen</th>
+        <th>reopen原因</th>
+        <th>解决方案</th>
+        <th>原因</th>
+        <th>责任人</th>
+        <th>日期</th>
+        <th>备注</th>
     </tr>
+</table><br>
+<h4>今日：</h4>
+<table id="today" border="1" cellpadding="0" cellspacing="0">
     <tr>
-        <td>Bill Gates</td>
-        <td>555 77 854</td>
-        <td>555 77 855</td>
+        <th>项目</th>
+        <th>工作类型</th>
+        <th>Bug ID</th>
+        <th>简要描述</th>
+        <th>优先级</th>
+        <th>是否reopen</th>
+        <th>reopen原因</th>
+        <th>解决方案</th>
+        <th>原因</th>
+        <th>责任人</th>
+        <th>日期</th>
+        <th>备注</th>
     </tr>
-    </table>
+    <tr id="content">
+        <td>
+            <input id="project" type="text">
+        </td>
+        <td>
+            <select id="work_type">
+                <option>解决bug</option>
+                <option>非bug库问题处理</option>
+                <option>基线升级</option>
+                <option>需求分析实现</option>
+                <option>团队建设</option>
+                <option>项目支持</option>
+                <option>SPM工作</option>
+                <option>请假</option>
+            </select>
+        </td>
+        <td>
+            <input id="bugid" type="text">
+        </td>
+        <td>
+            <textarea id="describe"></textarea>
+        </td>
+        <td>
+            <select id="priority">
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+            </select>
+        </td>
+        <td>
+            <select id="reopen">
+                <option>是</option>
+                <option>否</option>
+            </select>
+        </td>
+        <td>
+            <textarea id="reopen_reason"></textarea>
+        </td>
+        <td>
+            <select id="solution">
+                <option>入库</option>
+                <option>转其他组</option>
+                <option>非问题</option>
+                <option>是问题不修改</option>
+                <option>重复</option>
+                <option>不复现关闭</option>
+                <option>输出文档</option>
+            </select>
+        </td>
+        <td>
+            <select id="solution_reason">
+                <option>原始问题</option>
+                <option>转其他组</option>
+                <option>修改引入</option>
+                <option>新需求</option>
+                <option>需求遗留问题</option>
+                <option>非问题</option>
+            </select>
+        </td>
+        <td>
+            <p id="person">aaa</p>
+        </td>
+        <td>
+            <p id="date">2017/12/13</p>
+        </td>
+        <td>
+            <textarea id="remake"></textarea>
+        </td>
+    </tr>
+</table>
+<input id="insert" type="button" value="插入一行" onclick="insert()"><br>
+<input id="submit" type="button" value="提交" onclick="submit_info()">
+<script src="edit.js"></script>
 </body>
 </html>
