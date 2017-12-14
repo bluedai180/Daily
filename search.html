@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<p>搜索已发日报</p>
+worktype: <select id="work_type">
+    <option></option>
+    <option>解决bug</option>
+    <option>非bug库问题处理</option>
+    <option>基线升级</option>
+    <option>需求分析实现</option>
+    <option>团队建设</option>
+    <option>项目支持</option>
+    <option>SPM工作</option>
+    <option>请假</option>
+</select>
+bugid: <input id="search_bugid" type="text">
+describe: <input id="search_describe" type="text">
+solution: <select id="solution">
+    <option></option>
+    <option>入库</option>
+    <option>转其他组</option>
+    <option>非问题</option>
+    <option>是问题不修改</option>
+    <option>重复</option>
+    <option>不复现关闭</option>
+    <option>输出文档</option>
+</select>
+solution reason: <select id="solution_reason">
+    <option></option>
+    <option>原始问题</option>
+    <option>转其他组</option>
+    <option>修改引入</option>
+    <option>新需求</option>
+    <option>需求遗留问题</option>
+    <option>非问题</option>
+</select><br>
+start date: <input id="start_date" type="date">
+end date: <input id="end_date" type="date"><br><br>
+<input id="search" type="button" value="search" onclick="search()">
+
+<p>搜索结果：</p>
+<table id="result" border="1" cellpadding="0" cellspacing="0">
+    <tr>
+        <th>项目</th>
+        <th>工作类型</th>
+        <th>Bug ID</th>
+        <th>简要描述</th>
+        <th>优先级</th>
+        <th>是否reopen</th>
+        <th>reopen原因</th>
+        <th>解决方案</th>
+        <th>原因</th>
+        <th>责任人</th>
+        <th>日期</th>
+        <th>备注</th>
+    </tr>
+</table>
+<script src="search.js"></script>
+</body>
+</html>

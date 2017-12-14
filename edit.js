@@ -65,8 +65,19 @@ function insert() {
     today.appendChild(new_node.cloneNode(true));
 }
 
-function submit_info() {
-    var project = document.getElementById("project");
-    console.log(project.value);
+function submit_info(){
+    var mytable = document.getElementById("today");
+    var data = [];
+    for(var i=1,rows=mytable.rows.length; i<rows; i++){
+        for(var j=0,cells=mytable.rows[i].cells.length; j<cells; j++){
+            if(!data[i]){
+                data[i] = [];
+            }
+            data[i][j] = mytable.rows[i].cells[j].firstElementChild.value;
+        }
+    }
+    // var info = {
+    //     "info": data
+    // };
+    console.log(JSON.stringify(data.slice(1)));
 }
-
