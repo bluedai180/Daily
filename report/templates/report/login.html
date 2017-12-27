@@ -3,16 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <title>Daily</title>
+    <script src="http://cdn.bootcss.com/blueimp-md5/1.1.0/js/md5.js"></script>
+    <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
 </head>
 <body>
-    <script src="../../static/report/js/login.js"></script>
-    <script src="http://cdn.bootcss.com/blueimp-md5/1.1.0/js/md5.js"></script>
-    <p>This is daily report for app team.</p>
-    <form id="login-form" method="post" onsubmit="return checkForm()">
-        Username: <input type="text" id="username" name="username"><br>
-        Password: <input type="password" id="input-password"><br>
-        <input type="hidden" id="md5-password" name="password">
-        <button type="submit">Submit</button>
-    </form>
+<p>This is daily report for app team.</p>
+Username: <input type="text" id="username" name="username"><br>
+Password: <input type="password" id="input-password"><br>
+<input type="hidden" id="md5-password" name="password">
+<input type="button" id="user_login" value="login" onclick="user_login()">
+<script src="../../static/report/login.js"></script>
 </body>
 </html>

@@ -21,7 +21,8 @@
         <th>日期</th>
         <th>备注</th>
     </tr>
-</table><br>
+</table>
+<br>
 <h4>今日：</h4>
 <table id="today" border="1" cellpadding="0" cellspacing="0">
     <tr>
@@ -112,6 +113,47 @@
 </table>
 <input id="insert" type="button" value="插入一行" onclick="insert()"><br>
 <input id="submit" type="button" value="提交" onclick="submit_info()">
-<script src="../../static/report/js/edit.js"></script>
+{#<script src="../../static/report/edit.js"></script>#}
+<script>
+    console.log("111111111111");
+    var user = document.cookie.split(";")[1].split("=")[1];
+    console.log(user);
+
+{#    var last = document.getElementById("last");#}
+{#    var today = document.getElementById("today");#}
+{#    var json_obj = JSON.parse(json_text);#}
+{#    for (var i = 0; i < json_obj.info.length; i++) {#}
+{#        var line = document.createElement("tr");#}
+{#        for (var j = 0; j < json_obj.info[0].length; j++) {#}
+{#            var cell = document.createElement("td");#}
+{#            cell.innerText = json_obj.info[i][j];#}
+{#            line.appendChild(cell);#}
+{#        }#}
+{#        last.appendChild(line);#}
+{#    }#}
+
+    function insert() {
+        console.log("22222");
+        var new_node = document.getElementById("content");
+        today.appendChild(new_node.cloneNode(true));
+    }
+
+    function submit_info() {
+        var mytable = document.getElementById("today");
+        var data = [];
+        for (var i = 1, rows = mytable.rows.length; i < rows; i++) {
+            for (var j = 0, cells = mytable.rows[i].cells.length; j < cells; j++) {
+                if (!data[i]) {
+                    data[i] = [];
+                }
+                data[i][j] = mytable.rows[i].cells[j].firstElementChild.value;
+            }
+        }
+        // var info = {
+        //     "info": data
+        // };
+        console.log(JSON.stringify(data.slice(1)));
+    }
+</script>
 </body>
 </html>

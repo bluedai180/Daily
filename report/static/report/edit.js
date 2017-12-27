@@ -46,6 +46,9 @@ var json_text = "{\n" +
     "    ]\n" +
     "  ]" +
     "}";
+console.log("111111111111");
+var user = document.cookie;
+console.log(user);
 
 var last = document.getElementById("last");
 var today = document.getElementById("today");
@@ -61,6 +64,7 @@ for (var i = 0; i < json_obj.info.length; i++) {
 }
 
 function insert() {
+    console.log("22222");
     var new_node = document.getElementById("content");
     today.appendChild(new_node.cloneNode(true));
 }
