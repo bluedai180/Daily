@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Daily</title>
+    <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
 </head>
 <body>
 <h4>前三天：</h4>
@@ -63,6 +64,7 @@
         </td>
         <td>
             <select id="priority">
+                <option></option>
                 <option>1</option>
                 <option>2</option>
                 <option>3</option>
@@ -72,6 +74,7 @@
         </td>
         <td>
             <select id="reopen">
+                <option></option>
                 <option>是</option>
                 <option>否</option>
             </select>
@@ -81,6 +84,7 @@
         </td>
         <td>
             <select id="solution">
+                <option></option>
                 <option>入库</option>
                 <option>转其他组</option>
                 <option>非问题</option>
@@ -92,6 +96,7 @@
         </td>
         <td>
             <select id="solution_reason">
+                <option></option>
                 <option>原始问题</option>
                 <option>转其他组</option>
                 <option>修改引入</option>
@@ -101,10 +106,10 @@
             </select>
         </td>
         <td>
-            <input id="person" value="aaa" readonly="true"/>
+            <input id="person" readonly="true"/>
         </td>
         <td>
-            <input id="date" value="2017/12/13" readonly="true"/>
+            <input id="date" readonly="true"/>
         </td>
         <td>
             <textarea id="remake"></textarea>
@@ -115,22 +120,76 @@
 <input id="submit" type="button" value="提交" onclick="submit_info()">
 {#<script src="../../static/report/edit.js"></script>#}
 <script>
-    console.log("111111111111");
-    var user = document.cookie.split(";")[1].split("=")[1];
-    console.log(user);
+    var user = document.cookie.split(";")[1].split("=")[1].replace('"', '').replace('"', '');
+    $.get('get_last_info', {"user": user}, function (ret) {
+        show_last(ret);
+    });
 
-{#    var last = document.getElementById("last");#}
-{#    var today = document.getElementById("today");#}
-{#    var json_obj = JSON.parse(json_text);#}
-{#    for (var i = 0; i < json_obj.info.length; i++) {#}
-{#        var line = document.createElement("tr");#}
-{#        for (var j = 0; j < json_obj.info[0].length; j++) {#}
-{#            var cell = document.createElement("td");#}
-{#            cell.innerText = json_obj.info[i][j];#}
-{#            line.appendChild(cell);#}
-{#        }#}
-{#        last.appendChild(line);#}
-{#    }#}
+    $.get('get_current_name', {"user": user}, function (ret) {
+        document.getElementById("person").value = ret;
+    });
+
+    document.getElementById("date").value = getNowFormatDate();
+
+    function getNowFormatDate() {
+        var date = new Date();
+        var seperator1 = "-";
+        var year = date.getFullYear();
+        var month = date.getMonth() + 1;
+        var strDate = date.getDate();
+        if (month >= 1 && month <= 9) {
+            month = "0" + month;
+        }
+        if (strDate >= 0 && strDate <= 9) {
+            strDate = "0" + strDate;
+        }
+        return year + seperator1 + month + seperator1 + strDate;
+    }
+
+    function show_last(ret) {
+        var last = document.getElementById("last");
+        var today = document.getElementById("today");
+        for (var i = 0; i < ret.length; i++) {
+            var line = document.createElement("tr");
+            var cell_project = document.createElement("td");
+            var cell_work_type = document.createElement("td");
+            var cell_bugid = document.createElement("td");
+            var cell_describe = document.createElement("td");
+            var cell_priority = document.createElement("td");
+            var cell_reopen = document.createElement("td");
+            var cell_reopen_reason = document.createElement("td");
+            var cell_solution = document.createElement("td");
+            var cell_solution_reason = document.createElement("td");
+            var cell_person = document.createElement("td");
+            var cell_date = document.createElement("td");
+            var cell_remake = document.createElement("td");
+            cell_project.innerText = ret[i].project;
+            cell_work_type.innerText = ret[i].work_type;
+            cell_bugid.innerText = ret[i].bugid;
+            cell_describe.innerText = ret[i].describe;
+            cell_priority.innerText = ret[i].priority;
+            cell_reopen.innerText = ret[i].reopen;
+            cell_reopen_reason.innerText = ret[i].reopen_reason;
+            cell_solution.innerText = ret[i].solution;
+            cell_solution_reason.innerText = ret[i].solution_reason;
+            cell_person.innerText = ret[i].person;
+            cell_date.innerText = ret[i].date;
+            cell_remake.innerText = ret[i].remake;
+            line.appendChild(cell_project);
+            line.appendChild(cell_work_type);
+            line.appendChild(cell_bugid);
+            line.appendChild(cell_describe);
+            line.appendChild(cell_priority);
+            line.appendChild(cell_reopen);
+            line.appendChild(cell_reopen_reason);
+            line.appendChild(cell_solution);
+            line.appendChild(cell_solution_reason);
+            line.appendChild(cell_person);
+            line.appendChild(cell_date);
+            line.appendChild(cell_remake);
+            last.appendChild(line);
+        }
+    }
 
     function insert() {
         console.log("22222");
@@ -149,10 +208,10 @@
                 data[i][j] = mytable.rows[i].cells[j].firstElementChild.value;
             }
         }
-        // var info = {
-        //     "info": data
-        // };
-        console.log(JSON.stringify(data.slice(1)));
+        $.post("post_daily", {"user": user, "data": JSON.stringify(data.slice(1), null, '  ')}, function (ret) {
+           console.log(ret);
+        });
+        console.log(JSON.stringify(data.slice(1), null, '  '));
     }
 </script>
 </body>

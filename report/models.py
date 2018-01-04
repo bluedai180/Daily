@@ -20,18 +20,18 @@ class User(models.Model):
 
 
 class AppDaily(models.Model):
-    project = models.CharField(max_length=200)
-    work_type = models.CharField(max_length=50)
-    bugid = models.CharField(max_length=50)
-    describe = models.CharField(max_length=200)
-    priority = models.CharField(max_length=50)
-    reopen = models.BooleanField()
-    reopen_reason = models.CharField(max_length=200)
-    solution = models.CharField(max_length=50)
-    solution_reason = models.CharField(max_length=200)
-    person = models.CharField(max_length=50)
-    date = models.DateTimeField()
-    remake = models.CharField(max_length=200)
+    project = models.CharField(max_length=200, blank=True, null=True)
+    work_type = models.CharField(max_length=50, blank=True, null=True)
+    bugid = models.CharField(max_length=50, blank=True, null=True)
+    describe = models.CharField(max_length=200, blank=True, null=True)
+    priority = models.CharField(max_length=50, blank=True, null=True)
+    reopen = models.CharField(max_length=50, blank=True, null=True)
+    reopen_reason = models.CharField(max_length=200, blank=True, null=True)
+    solution = models.CharField(max_length=50, blank=True, null=True)
+    solution_reason = models.CharField(max_length=200, blank=True, null=True)
+    person = models.CharField(max_length=50, blank=True, null=True)
+    date = models.DateField(blank=True, null=True)
+    remake = models.CharField(max_length=200, blank=True, null=True)
     email = models.EmailField()
 
     def __str__(self):

@@ -9,5 +9,11 @@ class UserAdmin(admin.ModelAdmin):
     # fields = ["name", "email", "team"]
     list_display = ("name", "email", "team", "permission")
 
-admin.site.register([Team, AppDaily])
+
+class DailyAdmin(admin.ModelAdmin):
+    list_display = ("describe", "person", "date")
+
+
+admin.site.register(Team)
 admin.site.register(User, UserAdmin)
+admin.site.register(AppDaily, DailyAdmin)
