@@ -3,9 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
 </head>
 <body>
-<p>汇总日报：</p>
+<h1>以下人员未发日报：</h1>
+<p id="unbilled_user"></p>
+<h1>汇总日报：</h1>
 <table id="collection" border="1" cellpadding="0" cellspacing="0">
     <tr>
         <th>项目</th>
@@ -21,9 +24,70 @@
         <th>日期</th>
         <th>备注</th>
     </tr>
-</table><br><br>
+</table>
+<br><br>
 <input id="send_email" onclick="send()" type="button" value="send email">
 <input id="download" onclick="download()" type="button" value="download Excel">
-<script src="../../static/report/collect.js"></script>
+{#<script src="../../static/report/collect.js"></script>#}
+<script>
+    var team = document.cookie.split(";")[2].split("=")[1];
+    $.get('collect', {"team": team}, function (ret) {
+        show_today(ret.info);
+        document.getElementById("unbilled_user").innerText = ret.name.join(", ");
+    });
+
+    function show_today(ret) {
+        var today = document.getElementById("collection");
+        for (var i = 0; i < ret.length; i++) {
+            var line = document.createElement("tr");
+            var cell_project = document.createElement("td");
+            var cell_work_type = document.createElement("td");
+            var cell_bugid = document.createElement("td");
+            var cell_describe = document.createElement("td");
+            var cell_priority = document.createElement("td");
+            var cell_reopen = document.createElement("td");
+            var cell_reopen_reason = document.createElement("td");
+            var cell_solution = document.createElement("td");
+            var cell_solution_reason = document.createElement("td");
+            var cell_person = document.createElement("td");
+            var cell_date = document.createElement("td");
+            var cell_remake = document.createElement("td");
+            cell_project.innerText = ret[i].project;
+            cell_work_type.innerText = ret[i].work_type;
+            cell_bugid.innerText = ret[i].bugid;
+            cell_describe.innerText = ret[i].describe;
+            cell_priority.innerText = ret[i].priority;
+            cell_reopen.innerText = ret[i].reopen;
+            cell_reopen_reason.innerText = ret[i].reopen_reason;
+            cell_solution.innerText = ret[i].solution;
+            cell_solution_reason.innerText = ret[i].solution_reason;
+            cell_person.innerText = ret[i].person;
+            cell_date.innerText = ret[i].date;
+            cell_remake.innerText = ret[i].remake;
+            line.appendChild(cell_project);
+            line.appendChild(cell_work_type);
+            line.appendChild(cell_bugid);
+            line.appendChild(cell_describe);
+            line.appendChild(cell_priority);
+            line.appendChild(cell_reopen);
+            line.appendChild(cell_reopen_reason);
+            line.appendChild(cell_solution);
+            line.appendChild(cell_solution_reason);
+            line.appendChild(cell_person);
+            line.appendChild(cell_date);
+            line.appendChild(cell_remake);
+            today.appendChild(line);
+        }
+    }
+
+    function send() {
+        
+    }
+    
+    function download() {
+        
+    }
+
+</script>
 </body>
 </html>

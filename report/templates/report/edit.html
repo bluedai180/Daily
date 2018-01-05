@@ -6,6 +6,7 @@
     <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
 </head>
 <body>
+<input type="button" id="statistics" onclick="statistics()" value="统计日报">
 <h4>前三天：</h4>
 <table id="last" border="1">
     <tr>
@@ -120,13 +121,19 @@
 <input id="submit" type="button" value="提交" onclick="submit_info()">
 {#<script src="../../static/report/edit.js"></script>#}
 <script>
+    console.log(document.cookie);
     var user = document.cookie.split(";")[1].split("=")[1].replace('"', '').replace('"', '');
     $.get('get_last_info', {"user": user}, function (ret) {
-        show_last(ret);
+        if (ret != 0) {
+            show_last(ret);
+        }
     });
 
     $.get('get_current_name', {"user": user}, function (ret) {
-        document.getElementById("person").value = ret;
+        document.getElementById("person").value = ret["name"];
+        if (!ret["permission"]) {
+            document.getElementById("statistics").style.display = "none";
+        }
     });
 
     document.getElementById("date").value = getNowFormatDate();
@@ -209,9 +216,13 @@
             }
         }
         $.post("post_daily", {"user": user, "data": JSON.stringify(data.slice(1), null, '  ')}, function (ret) {
-           console.log(ret);
+            console.log(ret);
         });
         console.log(JSON.stringify(data.slice(1), null, '  '));
+    }
+
+    function statistics() {
+        window.location.href = "statistics";
     }
 </script>
 </body>

@@ -26,7 +26,10 @@ def check_user(request):
         return HttpResponse(-1)
     if user.pwd == pwd:
         response = HttpResponse(0)
+        # response.delete_cookie('user')
+        # response.delete_cookie('team')
         response.set_cookie('user', id)
+        response.set_cookie('team', user.team.name)
         return response
     else:
         return HttpResponse(-2)
@@ -45,7 +48,7 @@ def get_last_info(request):
     except AppDaily.DoesNotExist:
         return HttpResponse("have not last info")
     if len(info) == 0:
-        return HttpResponse("qqqqqqq")
+        return HttpResponse(0)
     return JsonResponse(list(info.values()), safe=False)
 
 
@@ -53,9 +56,10 @@ def get_current_name(request):
     user = request.GET['user']
     try:
         info = User.objects.get(email=user)
+        user_info = {"name": info.name, "permission": info.permission}
     except User.DoesNotExist:
         return HttpResponse("have not this user")
-    return HttpResponse(info.name)
+    return JsonResponse(user_info)
 
 
 @csrf_exempt
@@ -88,3 +92,27 @@ def post_daily(request):
         return HttpResponse("have not this user")
 
     return HttpResponse("app team")
+
+
+def statistics(request):
+    return render(request, 'report/collect.html')
+
+
+def collect(request):
+    team = request.GET['team']
+    try:
+        if team == "app":
+            daily = AppDaily.objects.filter(date=timezone.now().date())
+            if len(daily) == 0:
+                return HttpResponse(0)
+            current_user = [x['email'] for x in daily.values('email').distinct()]
+            team_user = [x.email for x in User.objects.filter(team__name='app')]
+            ret_list = []
+            for x in list(set(current_user) ^ set(team_user)):
+                ret_list.append(User.objects.get(email=x).name)
+            print(ret_list)
+    except AppDaily.DoesNotExist:
+        return HttpResponse(-1)
+
+    info = {'info': list(daily.values()), 'name': ret_list}
+    return JsonResponse(info, safe=False)
