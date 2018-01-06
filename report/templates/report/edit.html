@@ -122,9 +122,9 @@
 {#<script src="../../static/report/edit.js"></script>#}
 <script>
     console.log(document.cookie);
-    var user = document.cookie.split(";")[1].split("=")[1].replace('"', '').replace('"', '');
+    var user = document.cookie.match(/(^| )user=([^;]*)(;|$)/)[2].replace('"', '').replace('"', '');
     $.get('get_last_info', {"user": user}, function (ret) {
-        if (ret != 0) {
+        if (ret !== 0) {
             show_last(ret);
         }
     });

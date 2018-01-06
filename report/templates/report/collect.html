@@ -30,10 +30,14 @@
 <input id="download" onclick="download()" type="button" value="download Excel">
 {#<script src="../../static/report/collect.js"></script>#}
 <script>
-    var team = document.cookie.split(";")[2].split("=")[1];
+    var team = document.cookie.match(/(^| )team=([^;]*)(;|$)/)[2];
+    console.log(team);
+    {#var team = document.cookie.split(";")[2].split("=")[1];#}
     $.get('collect', {"team": team}, function (ret) {
-        show_today(ret.info);
-        document.getElementById("unbilled_user").innerText = ret.name.join(", ");
+        if (ret != 0) {
+            show_today(ret.info);
+            document.getElementById("unbilled_user").innerText = ret.name.join(", ");
+        }
     });
 
     function show_today(ret) {
@@ -81,11 +85,11 @@
     }
 
     function send() {
-        
+
     }
-    
+
     function download() {
-        
+
     }
 
 </script>
