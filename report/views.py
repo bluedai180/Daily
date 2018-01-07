@@ -1,17 +1,14 @@
-import json
-
-from django.core.serializers.json import DjangoJSONEncoder
 from django.shortcuts import render
 
 from .models import User, Team, AppDaily
-from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
-from django.urls import reverse
+from .excel import Excel
+from django.http import HttpResponse, JsonResponse, StreamingHttpResponse
 from django.utils import timezone
-from django.forms.models import model_to_dict
-from django.views.decorators.csrf import csrf_protect, csrf_exempt
+from django.views.decorators.csrf import csrf_exempt
 import datetime
 import json
 
+list_info_today = []
 
 def login(request):
     return render(request, 'report/login.html')
@@ -100,6 +97,7 @@ def statistics(request):
 
 def collect(request):
     team = request.GET['team']
+    list_info_today.clear()
     try:
         if team == "app":
             daily = AppDaily.objects.filter(date=timezone.now().date())
@@ -110,9 +108,31 @@ def collect(request):
             ret_list = []
             for x in list(set(current_user) ^ set(team_user)):
                 ret_list.append(User.objects.get(email=x).name)
-            print(ret_list)
+            for x in daily.values_list():
+                list_info_today.append(list(x)[1:-1])
     except AppDaily.DoesNotExist:
         return HttpResponse(-1)
-
     info = {'info': list(daily.values()), 'name': ret_list}
     return JsonResponse(info, safe=False)
+
+
+def download(request):
+
+    excel = Excel()
+    the_file_path = excel.write_to_excel(list_info_today)
+
+    def file_iterator(file_name):
+        with open(file_name, 'rb') as f:
+            while True:
+                c = f.read()
+                if c:
+                    yield c
+                else:
+                    break
+
+    the_file_name = "daily.xlsx"
+    response = StreamingHttpResponse(file_iterator(the_file_path))
+    response['Content-Type'] = 'application/octet-stream'
+    response['Content-Disposition'] = 'attachment;filename="{0}"'.format(the_file_name)
+
+    return response

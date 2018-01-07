@@ -12,5 +12,6 @@ urlpatterns = [
     path('get_current_name', views.get_current_name, name='get_current_name'),
     path('post_daily', views.post_daily, name='post_daily'),
     path('statistics', views.statistics, name='statistics'),
-    path('collect', views.collect, name='collect')
+    path('collect', views.collect, name='collect'),
+    path('download', views.download, name='download')
 ]
