@@ -1,6 +1,9 @@
+from jdcal import gcal2jd
 from openpyxl import Workbook
-from openpyxl.styles import Border, Side, Font, Alignment, NamedStyle
+from openpyxl.styles import Border, Side, Font, Alignment, NamedStyle, Color, Fill, colors
 import time
+
+from openpyxl.styles.numbers import FORMAT_DATE_YYYYMMDD2
 
 
 class Excel:
@@ -9,15 +12,20 @@ class Excel:
         self.wb_new = Workbook()
         self.ws_new = self.wb_new.active
         self.ws_new.title = "日报"
+        self.yellow_lines = []
 
     def write_to_excel(self, data):
         self.ws_new.append(['项目', '工作类别', 'Bug ID', '简要描述', '优先级', '是否reopen', 'reopen原因', '解决方案',
                             '原因', '责任人', '日期', '备注'])
+        i = 0
         for x in data:
+            if x[7] == "入库":
+                self.yellow_lines.append(i)
             self.ws_new.append(x)
+            i += 1
         self.format_file()
-
-        file_name = "report/temp/"+str(time.time())+".xlsx"
+        print(self.yellow_lines)
+        file_name = "report/temp/" + str(time.time()) + ".xlsx"
         self.wb_new.save(file_name)
         return file_name
 
@@ -42,6 +50,7 @@ class Excel:
         title.border = Border(left=left, right=right, top=top, bottom=bottom)
         content = NamedStyle(name="content")
         content.font = Font(name=u'宋体', size=11)
+        content.number_format = FORMAT_DATE_YYYYMMDD2
         content.alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
         content.border = Border(left=left, right=right, top=top, bottom=bottom)
         content_long = NamedStyle(name="content_long")
@@ -75,3 +84,7 @@ class Excel:
 
         for x in self.ws_new['G'][1:]:
             x.style = content_long
+
+        # for i in self.yellow_lines:
+        #     for x in self.ws_new[i+2]:
+        #         x.style.fill.bgColor = Color(colors.YELLOW)
