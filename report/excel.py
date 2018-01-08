@@ -1,6 +1,6 @@
-from jdcal import gcal2jd
 from openpyxl import Workbook
-from openpyxl.styles import Border, Side, Font, Alignment, NamedStyle, Color, Fill, colors
+from openpyxl.styles import Border, Side, Font, Alignment, NamedStyle, colors
+import openpyxl.styles as sty
 import time
 
 from openpyxl.styles.numbers import FORMAT_DATE_YYYYMMDD2
@@ -24,7 +24,6 @@ class Excel:
             self.ws_new.append(x)
             i += 1
         self.format_file()
-        print(self.yellow_lines)
         file_name = "report/temp/" + str(time.time()) + ".xlsx"
         self.wb_new.save(file_name)
         return file_name
@@ -85,6 +84,6 @@ class Excel:
         for x in self.ws_new['G'][1:]:
             x.style = content_long
 
-        # for i in self.yellow_lines:
-        #     for x in self.ws_new[i+2]:
-        #         x.style.fill.bgColor = Color(colors.YELLOW)
+        for i in self.yellow_lines:
+            for x in self.ws_new[i + 2]:
+                x.fill = sty.PatternFill(fill_type='solid', fgColor=colors.YELLOW)

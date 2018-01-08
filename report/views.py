@@ -10,6 +10,7 @@ import json
 
 list_info_today = []
 
+
 def login(request):
     return render(request, 'report/login.html')
 
@@ -23,8 +24,6 @@ def check_user(request):
         return HttpResponse(-1)
     if user.pwd == pwd:
         response = HttpResponse(0)
-        # response.delete_cookie('user')
-        # response.delete_cookie('team')
         response.set_cookie('user', id)
         response.set_cookie('team', user.team.name)
         return response
@@ -117,7 +116,6 @@ def collect(request):
 
 
 def download(request):
-
     excel = Excel()
     the_file_path = excel.write_to_excel(list_info_today)
 
@@ -130,7 +128,7 @@ def download(request):
                 else:
                     break
 
-    the_file_name = "daily.xlsx"
+    the_file_name = "daily-%s.xlsx" % timezone.now().date().strftime("%Y-%m-%d")
     response = StreamingHttpResponse(file_iterator(the_file_path))
     response['Content-Type'] = 'application/octet-stream'
     response['Content-Disposition'] = 'attachment;filename="{0}"'.format(the_file_name)
