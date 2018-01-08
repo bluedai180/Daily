@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
 </head>
 <body>
 <p>搜索已发日报</p>
 worktype: <select id="work_type">
-    <option></option>
     <option>解决bug</option>
     <option>非bug库问题处理</option>
     <option>基线升级</option>
@@ -16,9 +16,9 @@ worktype: <select id="work_type">
     <option>项目支持</option>
     <option>SPM工作</option>
     <option>请假</option>
-</select>
-bugid: <input id="search_bugid" type="text">
-describe: <input id="search_describe" type="text">
+</select><br>
+bugid: <input id="search_bugid" type="text"><br>
+describe: <input id="search_describe" type="text"><br>
 solution: <select id="solution">
     <option></option>
     <option>入库</option>
@@ -28,7 +28,7 @@ solution: <select id="solution">
     <option>重复</option>
     <option>不复现关闭</option>
     <option>输出文档</option>
-</select>
+</select><br>
 solution reason: <select id="solution_reason">
     <option></option>
     <option>原始问题</option>
@@ -37,12 +37,13 @@ solution reason: <select id="solution_reason">
     <option>新需求</option>
     <option>需求遗留问题</option>
     <option>非问题</option>
-</select>
-start date: <input id="start_date" type="date">
+</select><br>
+start date: <input id="start_date" type="date"><br>
 end date: <input id="end_date" type="date"><br><br>
 <input id="search" type="button" value="search" onclick="search()">
 
 <p>搜索结果：</p>
+<input onclick="download()" value="download excel" type="button"><br><br>
 <table id="result" border="1" cellpadding="0" cellspacing="0">
     <tr>
         <th>项目</th>
@@ -59,6 +60,88 @@ end date: <input id="end_date" type="date"><br><br>
         <th>备注</th>
     </tr>
 </table>
-<script src="../../static/report/search.js"></script>
+{#<script src="../../static/report/search.js"></script>#}
+<script>
+    var team = document.cookie.match(/(^| )team=([^;]*)(;|$)/)[2];
+
+    function search() {
+
+        if ("" === document.getElementById("work_type").value) {
+            alert("工作类型不能为空！");
+            return
+        }
+
+        if (("" === document.getElementById("start_date").value && "" !== document.getElementById("end_date").value) ||
+            ("" === document.getElementById("end_date").value && "" !== document.getElementById("start_date").value)) {
+            alert("起始、终止日期要填全！");
+            return
+        }
+
+        var info = {
+            team: team,
+            worktype: document.getElementById("work_type").value,
+            bugid: document.getElementById("search_bugid").value,
+            describe: document.getElementById("search_describe").value,
+            solution: document.getElementById("solution_reason").value,
+            start_date: document.getElementById("start_date").value,
+            end_date: document.getElementById("end_date").value
+        };
+        $.get('search_info', {"info": JSON.stringify(info)}, function (ret) {
+            if (ret != 0){
+                show_result(ret);
+            }
+        })
+    }
+
+    function show_result(ret) {
+        var result = document.getElementById("result");
+        $("#result").find("tr:not(:first)").empty("");
+        console.log(result.children);
+        for (var i = 0; i < ret.length; i++) {
+            var line = document.createElement("tr");
+            var cell_project = document.createElement("td");
+            var cell_work_type = document.createElement("td");
+            var cell_bugid = document.createElement("td");
+            var cell_describe = document.createElement("td");
+            var cell_priority = document.createElement("td");
+            var cell_reopen = document.createElement("td");
+            var cell_reopen_reason = document.createElement("td");
+            var cell_solution = document.createElement("td");
+            var cell_solution_reason = document.createElement("td");
+            var cell_person = document.createElement("td");
+            var cell_date = document.createElement("td");
+            var cell_remake = document.createElement("td");
+            cell_project.innerText = ret[i].project;
+            cell_work_type.innerText = ret[i].work_type;
+            cell_bugid.innerText = ret[i].bugid;
+            cell_describe.innerText = ret[i].describe;
+            cell_priority.innerText = ret[i].priority;
+            cell_reopen.innerText = ret[i].reopen;
+            cell_reopen_reason.innerText = ret[i].reopen_reason;
+            cell_solution.innerText = ret[i].solution;
+            cell_solution_reason.innerText = ret[i].solution_reason;
+            cell_person.innerText = ret[i].person;
+            cell_date.innerText = ret[i].date;
+            cell_remake.innerText = ret[i].remake;
+            line.appendChild(cell_project);
+            line.appendChild(cell_work_type);
+            line.appendChild(cell_bugid);
+            line.appendChild(cell_describe);
+            line.appendChild(cell_priority);
+            line.appendChild(cell_reopen);
+            line.appendChild(cell_reopen_reason);
+            line.appendChild(cell_solution);
+            line.appendChild(cell_solution_reason);
+            line.appendChild(cell_person);
+            line.appendChild(cell_date);
+            line.appendChild(cell_remake);
+            result.appendChild(line);
+        }
+    }
+
+    function download() {
+
+    }
+</script>
 </body>
 </html>

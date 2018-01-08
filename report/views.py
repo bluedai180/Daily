@@ -134,3 +134,31 @@ def download(request):
     response['Content-Disposition'] = 'attachment;filename="{0}"'.format(the_file_name)
 
     return response
+
+
+def search(request):
+    return render(request, 'report/search.html')
+
+
+def search_info(request):
+    info = json.loads(request.GET['info'])
+    if info['team'] == "app":
+        worktype = info['worktype']
+        bugid = info['bugid']
+        describe = info['describe']
+        solution = info['solution']
+        start_date = info['start_date']
+        end_date = info['end_date']
+        result = AppDaily.objects.filter(work_type=worktype)
+        if bugid != "":
+            result = result.filter(bugid=bugid)
+        elif describe != "":
+            result = result.filter(describe=describe)
+        elif solution != "":
+            result = result.filter(solution=solution)
+        elif start_date != "" and end_date != "":
+            result = result.filter(date__range=(start_date, end_date))
+
+    if len(result) == 0:
+        return HttpResponse(0)
+    return JsonResponse(list(result.values()), safe=False)

@@ -13,5 +13,7 @@ urlpatterns = [
     path('post_daily', views.post_daily, name='post_daily'),
     path('statistics', views.statistics, name='statistics'),
     path('collect', views.collect, name='collect'),
-    path('download', views.download, name='download')
+    path('download', views.download, name='download'),
+    path('search', views.search, name='search'),
+    path('search_info', views.search_info, name="search_info")
 ]
