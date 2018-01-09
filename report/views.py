@@ -9,6 +9,7 @@ import datetime
 import json
 
 list_info_today = []
+list_info_result = []
 
 
 def login(request):
@@ -117,7 +118,7 @@ def collect(request):
 
 def download(request):
     excel = Excel()
-    the_file_path = excel.write_to_excel(list_info_today)
+    the_file_path = excel.write_to_excel(list_info_today, mark=True)
 
     def file_iterator(file_name):
         with open(file_name, 'rb') as f:
@@ -141,6 +142,7 @@ def search(request):
 
 
 def search_info(request):
+    list_info_result.clear()
     info = json.loads(request.GET['info'])
     if info['team'] == "app":
         worktype = info['worktype']
@@ -159,6 +161,30 @@ def search_info(request):
         elif start_date != "" and end_date != "":
             result = result.filter(date__range=(start_date, end_date))
 
+    for x in result.values_list():
+        list_info_result.append(list(x)[1:-1])
+
     if len(result) == 0:
         return HttpResponse(0)
     return JsonResponse(list(result.values()), safe=False)
+
+
+def download_search(request):
+    excel = Excel()
+    the_file_path = excel.write_to_excel(list_info_result)
+
+    def file_iterator(file_name):
+        with open(file_name, 'rb') as f:
+            while True:
+                c = f.read()
+                if c:
+                    yield c
+                else:
+                    break
+
+    the_file_name = "search-%s.xlsx" % timezone.now().date().strftime("%Y-%m-%d")
+    response = StreamingHttpResponse(file_iterator(the_file_path))
+    response['Content-Type'] = 'application/octet-stream'
+    response['Content-Disposition'] = 'attachment;filename="{0}"'.format(the_file_name)
+
+    return response
