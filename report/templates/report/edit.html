@@ -41,6 +41,7 @@
         <th>责任人</th>
         <th>日期</th>
         <th>备注</th>
+        <th></th>
     </tr>
     <tr id="content">
         <td>
@@ -115,6 +116,9 @@
         </td>
         <td>
             <textarea id="remake"></textarea>
+        </td>
+        <td>
+            <input id="delete_item" type="button" value="delete" onclick="delete_item(this.parentElement.parentElement.id)">
         </td>
     </tr>
 </table>
@@ -198,11 +202,12 @@
             last.appendChild(line);
         }
     }
-
+    var i = 0;
     function insert() {
-        console.log("22222");
-        var new_node = document.getElementById("content");
-        today.appendChild(new_node.cloneNode(true));
+        var new_node = document.getElementById("content").cloneNode(true);
+        new_node.id = "content_" + i.toString();
+        today.appendChild(new_node);
+        i ++;
     }
 
     function submit_info() {
@@ -218,6 +223,11 @@
         }
         $.post("post_daily", {"user": user, "data": JSON.stringify(data.slice(1), null, '  ')}, function (ret) {
             console.log(ret);
+            if (Number(ret) === 0) {
+                alert("提交成功！")
+            } else {
+                alert("提交失败！")
+            }
         });
         console.log(JSON.stringify(data.slice(1), null, '  '));
     }
@@ -228,6 +238,12 @@
 
     function search() {
         window.location.href = "search";
+    }
+
+    function delete_item(id) {
+        var self = document.getElementById(id);
+        var parent = self.parentElement;
+        parent.removeChild(self);
     }
 
 </script>

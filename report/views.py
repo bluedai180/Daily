@@ -67,7 +67,7 @@ def post_daily(request):
         team = User.objects.get(email=user)
         info = json.loads(data)
         if team.team.name == "app":
-            print("111111111")
+            pass
         for x in info:
             user_team = AppDaily()
             user_team.project = x[0]
@@ -86,9 +86,9 @@ def post_daily(request):
             user_team.save()
 
     except User.DoesNotExist:
-        return HttpResponse("have not this user")
+        return HttpResponse(-1)
 
-    return HttpResponse("app team")
+    return HttpResponse(0)
 
 
 def statistics(request):
