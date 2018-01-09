@@ -7,7 +7,7 @@
 </head>
 <body>
 <p>搜索已发日报</p>
-worktype: <select id="work_type">
+工作类型: <select id="work_type">
     <option>解决bug</option>
     <option>非bug库问题处理</option>
     <option>基线升级</option>
@@ -17,9 +17,9 @@ worktype: <select id="work_type">
     <option>SPM工作</option>
     <option>请假</option>
 </select><br>
-bugid: <input id="search_bugid" type="text"><br>
-describe: <input id="search_describe" type="text"><br>
-solution: <select id="solution">
+Bug ID: <input id="search_bugid" type="text"><br>
+简要描述: <input id="search_describe" type="text"><br>
+解决方案: <select id="solution">
     <option></option>
     <option>入库</option>
     <option>转其他组</option>
@@ -29,7 +29,7 @@ solution: <select id="solution">
     <option>不复现关闭</option>
     <option>输出文档</option>
 </select><br>
-solution reason: <select id="solution_reason">
+原因: <select id="solution_reason">
     <option></option>
     <option>原始问题</option>
     <option>转其他组</option>
@@ -38,13 +38,19 @@ solution reason: <select id="solution_reason">
     <option>需求遗留问题</option>
     <option>非问题</option>
 </select><br>
-start date: <input id="start_date" type="date"><br>
-end date: <input id="end_date" type="date"><br><br>
+起始日期: <input id="start_date" type="date"><br>
+结束日期: <input id="end_date" type="date"><br>
+责任人: <input id="user" type="email"><br><br>
 <input id="search" type="button" value="search" onclick="search()">
 
 <p>搜索结果：</p>
 <input onclick="download()" value="download excel" type="button"><br><br>
-<table id="result" border="1" cellpadding="0" cellspacing="0">
+<style type="text/css">
+    .AutoNewline {
+        Word-break: break-all;
+    }
+</style>
+<table class="AutoNewline" id="result" border="1" cellpadding="0" cellspacing="0">
     <tr>
         <th>项目</th>
         <th>工作类型</th>
@@ -84,7 +90,8 @@ end date: <input id="end_date" type="date"><br><br>
             describe: document.getElementById("search_describe").value,
             solution: document.getElementById("solution_reason").value,
             start_date: document.getElementById("start_date").value,
-            end_date: document.getElementById("end_date").value
+            end_date: document.getElementById("end_date").value,
+            user: document.getElementById("user").value
         };
         $.get('search_info', {"info": JSON.stringify(info)}, function (ret) {
             if (ret != 0){

@@ -7,9 +7,15 @@
 </head>
 <body>
 <input type="button" id="statistics" onclick="statistics()" value="统计日报">
+<input type="button" id="today" onclick="modify_today()" value="修改今日已发">
 <input type="button" id="search" onclick="search()" value="搜索">
 <h4>前三天：</h4>
-<table id="last" border="1">
+<style type="text/css">
+    .AutoNewline {
+        Word-break: break-all;
+    }
+</style>
+<table class="AutoNewline" id="last" border="1">
     <tr>
         <th>项目</th>
         <th>工作类型</th>
@@ -135,9 +141,12 @@
     });
 
     $.get('get_current_name', {"user": user}, function (ret) {
+        console.log(ret);
         document.getElementById("person").value = ret["name"];
         if (!ret["permission"]) {
             document.getElementById("statistics").style.display = "none";
+        } else if (!ret['today']) {
+            document.getElementById('today').style.display = "none";
         }
     });
 
@@ -244,6 +253,10 @@
         var self = document.getElementById(id);
         var parent = self.parentElement;
         parent.removeChild(self);
+    }
+
+    function modify_today() {
+
     }
 
 </script>

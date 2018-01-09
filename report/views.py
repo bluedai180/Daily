@@ -44,7 +44,7 @@ def get_last_info(request):
             date__range=(date - datetime.timedelta(days=3), date - datetime.timedelta(days=1)))
     except AppDaily.DoesNotExist:
         return HttpResponse("have not last info")
-    if len(info) == 0:
+    if info.count() == 0:
         return HttpResponse(0)
     return JsonResponse(list(info.values()), safe=False)
 
@@ -54,6 +54,12 @@ def get_current_name(request):
     try:
         info = User.objects.get(email=user)
         user_info = {"name": info.name, "permission": info.permission}
+        if info.team.name == "app":
+            today = AppDaily.objects.filter(date=timezone.now().date()).filter(email=user)
+            if today.count() == 0:
+                user_info['today'] = False
+            else:
+                user_info['today'] = True
     except User.DoesNotExist:
         return HttpResponse("have not this user")
     return JsonResponse(user_info)
@@ -101,7 +107,7 @@ def collect(request):
     try:
         if team == "app":
             daily = AppDaily.objects.filter(date=timezone.now().date())
-            if len(daily) == 0:
+            if daily.count() == 0:
                 return HttpResponse(0)
             current_user = [x['email'] for x in daily.values('email').distinct()]
             team_user = [x.email for x in User.objects.filter(team__name='app')]
@@ -151,6 +157,7 @@ def search_info(request):
         solution = info['solution']
         start_date = info['start_date']
         end_date = info['end_date']
+        user = info['user']
         result = AppDaily.objects.filter(work_type=worktype)
         if bugid != "":
             result = result.filter(bugid=bugid)
@@ -160,11 +167,13 @@ def search_info(request):
             result = result.filter(solution=solution)
         elif start_date != "" and end_date != "":
             result = result.filter(date__range=(start_date, end_date))
+        elif user != "":
+            result = result.filter(email=user)
 
     for x in result.values_list():
         list_info_result.append(list(x)[1:-1])
 
-    if len(result) == 0:
+    if result.count() == 0:
         return HttpResponse(0)
     return JsonResponse(list(result.values()), safe=False)
 
