@@ -16,5 +16,6 @@ urlpatterns = [
     path('download', views.download, name='download'),
     path('search', views.search, name='search'),
     path('search_info', views.search_info, name="search_info"),
-    path('download_search', views.download_search, name="download_search")
+    path('download_search', views.download_search, name="download_search"),
+    path('today', views.today, name="today")
 ]

@@ -7,7 +7,7 @@
 </head>
 <body>
 <input type="button" id="statistics" onclick="statistics()" value="统计日报">
-<input type="button" id="today" onclick="modify_today()" value="修改今日已发">
+<input type="button" id="modify_today" onclick="modify_today()" value="修改今日已发">
 <input type="button" id="search" onclick="search()" value="搜索">
 <h4>前三天：</h4>
 <style type="text/css">
@@ -49,7 +49,7 @@
         <th>备注</th>
         <th></th>
     </tr>
-    <tr id="content">
+    <tr id="content_0">
         <td>
             <input id="project" type="text">
         </td>
@@ -124,7 +124,8 @@
             <textarea id="remake"></textarea>
         </td>
         <td>
-            <input id="delete_item" type="button" value="delete" onclick="delete_item(this.parentElement.parentElement.id)">
+            <input id="delete_item" type="button" value="delete"
+                   onclick="delete_item(this.parentElement.parentElement.id)">
         </td>
     </tr>
 </table>
@@ -133,6 +134,9 @@
 {#<script src="../../static/report/edit.js"></script>#}
 <script>
     console.log(document.cookie);
+    var i = 1;
+    var data_old = [];
+    var info_id = [];
     var user = document.cookie.match(/(^| )user=([^;]*)(;|$)/)[2].replace('"', '').replace('"', '');
     $.get('get_last_info', {"user": user}, function (ret) {
         if (ret != 0) {
@@ -143,10 +147,26 @@
     $.get('get_current_name', {"user": user}, function (ret) {
         console.log(ret);
         document.getElementById("person").value = ret["name"];
+        var today = ret['today'];
         if (!ret["permission"]) {
             document.getElementById("statistics").style.display = "none";
-        } else if (!ret['today']) {
-            document.getElementById('today').style.display = "none";
+        } else if (today != "") {
+            show_today(document.getElementById('content_0').children, today[0]);
+            info_id.push(today[0]['id']);
+            for (var j = 1; j < today.length; j++) {
+                info_id.push(today[j]['id']);
+                insert();
+                show_today(document.getElementById('content_' + j.toString()).children, today[j]);
+            }
+            var mytable = document.getElementById("today");
+            for (var i = 1, rows = mytable.rows.length; i < rows; i++) {
+                for (var z = 0, cells = mytable.rows[i].cells.length; z < cells; z++) {
+                    if (!data_old[i]) {
+                        data_old[i] = [];
+                    }
+                    data_old[i][z] = mytable.rows[i].cells[z].firstElementChild.value;
+                }
+            }
         }
     });
 
@@ -165,6 +185,21 @@
             strDate = "0" + strDate;
         }
         return year + seperator1 + month + seperator1 + strDate;
+    }
+
+    function show_today(ch, today) {
+        ch[0].childNodes[1].value = today['project'];
+        ch[1].childNodes[1].value = today['work_type'];
+        ch[2].childNodes[1].value = today['bugid'];
+        ch[3].childNodes[1].value = today['describe'];
+        ch[4].childNodes[1].value = today['priority'];
+        ch[5].childNodes[1].value = today['reopen'];
+        ch[6].childNodes[1].value = today['reopen_reason'];
+        ch[7].childNodes[1].value = today['solution'];
+        ch[8].childNodes[1].value = today['solution_reason'];
+        ch[9].childNodes[1].value = today['person'];
+        ch[10].childNodes[1].value = today['date'];
+        ch[11].childNodes[1].value = today['remake'];
     }
 
     function show_last(ret) {
@@ -211,34 +246,61 @@
             last.appendChild(line);
         }
     }
-    var i = 0;
+
     function insert() {
-        var new_node = document.getElementById("content").cloneNode(true);
+        var new_node = document.getElementById("content_0").cloneNode(true);
         new_node.id = "content_" + i.toString();
         today.appendChild(new_node);
-        i ++;
+        i++;
     }
 
     function submit_info() {
         var mytable = document.getElementById("today");
+        var data_new = [];
         var data = [];
+        var modify_id = [];
+        var modify_data = [];
         for (var i = 1, rows = mytable.rows.length; i < rows; i++) {
             for (var j = 0, cells = mytable.rows[i].cells.length; j < cells; j++) {
-                if (!data[i]) {
-                    data[i] = [];
+                if (!data_new[i]) {
+                    data_new[i] = [];
                 }
-                data[i][j] = mytable.rows[i].cells[j].firstElementChild.value;
+                data_new[i][j] = mytable.rows[i].cells[j].firstElementChild.value;
             }
         }
-        $.post("post_daily", {"user": user, "data": JSON.stringify(data.slice(1), null, '  ')}, function (ret) {
-            console.log(ret);
-            if (Number(ret) === 0) {
-                alert("提交成功！")
-            } else {
-                alert("提交失败！")
+        if (data_old.length === 0) {
+            data = data_new.slice(1);
+        } else if (data_old.length === data_new.length){
+            for (var z = 0; z < info_id.length; z++) {
+                if (!compare(data_old[z + 1], data_new[z + 1])) {
+                    modify_id.push(info_id[z]);
+                    modify_data.push(data_new[z + 1]);
+                }
             }
-        });
-        console.log(JSON.stringify(data.slice(1), null, '  '));
+        } else if (data_old.length < data_new.length) {
+            data.push(data_new.slice(data_old.length));
+        } else if (data_old.length > data_new.length) {
+
+        }
+        if (data_old.length !== 0 && modify_id.length === 0) {
+            alert("内容无修改，提交失败! ");
+            return
+        }
+
+        $.post("post_daily", {
+                    "user": user,
+                    "data": JSON.stringify(data),
+                    "modify_id": JSON.stringify(modify_id),
+                    "modify_data": JSON.stringify(modify_data)
+                },
+                function (ret) {
+                    console.log(ret);
+                    if (Number(ret) === 0) {
+                        alert("提交成功！")
+                    } else {
+                        alert("提交失败！")
+                    }
+                });
     }
 
     function statistics() {
@@ -256,7 +318,13 @@
     }
 
     function modify_today() {
+        window.location.href = "today";
+    }
 
+    function compare() {
+        for (var i = 0; i < arguments.length; i++) {
+            return arguments[i].toString() == arguments[i + 1].toString();
+        }
     }
 
 </script>

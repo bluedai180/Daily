@@ -57,9 +57,9 @@ def get_current_name(request):
         if info.team.name == "app":
             today = AppDaily.objects.filter(date=timezone.now().date()).filter(email=user)
             if today.count() == 0:
-                user_info['today'] = False
+                user_info['today'] = ""
             else:
-                user_info['today'] = True
+                user_info['today'] = list(today.values())
     except User.DoesNotExist:
         return HttpResponse("have not this user")
     return JsonResponse(user_info)
@@ -69,27 +69,45 @@ def get_current_name(request):
 def post_daily(request):
     user = request.POST['user']
     data = request.POST['data']
+    modify_id = request.POST['modify_id']
+    modify_data = request.POST['modify_data']
     try:
         team = User.objects.get(email=user)
         info = json.loads(data)
+        ids = json.loads(modify_id)
         if team.team.name == "app":
             pass
-        for x in info:
-            user_team = AppDaily()
-            user_team.project = x[0]
-            user_team.work_type = x[1]
-            user_team.bugid = x[2]
-            user_team.describe = x[3]
-            user_team.priority = x[4]
-            user_team.reopen = x[5]
-            user_team.reopen_reason = x[6]
-            user_team.solution = x[7]
-            user_team.solution_reason = x[8]
-            user_team.person = x[9]
-            user_team.date = datetime.datetime.strptime(x[10], "%Y-%m-%d")
-            user_team.remake = x[11]
-            user_team.email = user
-            user_team.save()
+        if len(info) != 0:
+            for x in info:
+                user_team = AppDaily()
+                user_team.project = x[0]
+                user_team.work_type = x[1]
+                user_team.bugid = x[2]
+                user_team.describe = x[3]
+                user_team.priority = x[4]
+                user_team.reopen = x[5]
+                user_team.reopen_reason = x[6]
+                user_team.solution = x[7]
+                user_team.solution_reason = x[8]
+                user_team.person = x[9]
+                user_team.date = datetime.datetime.strptime(x[10], "%Y-%m-%d")
+                user_team.remake = x[11]
+                user_team.email = user
+                user_team.save()
+        else:
+            for i in range(len(ids)):
+                user_team = AppDaily.objects.get(id=ids[i])
+                user_team.project = info[i][0]
+                user_team.work_type = info[i][1]
+                user_team.bugid = info[i][2]
+                user_team.describe = info[i][3]
+                user_team.priority = info[i][4]
+                user_team.reopen = info[i][5]
+                user_team.reopen_reason = info[i][6]
+                user_team.solution = info[i][7]
+                user_team.solution_reason = info[i][8]
+                user_team.remake = info[i][11]
+                user_team.save()
 
     except User.DoesNotExist:
         return HttpResponse(-1)
@@ -197,3 +215,7 @@ def download_search(request):
     response['Content-Disposition'] = 'attachment;filename="{0}"'.format(the_file_name)
 
     return response
+
+
+def today(request):
+    return render(request, 'report/today.html')
