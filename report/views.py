@@ -36,49 +36,41 @@ def edit(request):
     return render(request, 'report/edit.html')
 
 
-def get_last_info(request):
-    user = request.GET['user']
-    date = timezone.now().date()
-    try:
-        info = AppDaily.objects.filter(email=user).filter(
-            date__range=(date - datetime.timedelta(days=3), date - datetime.timedelta(days=1)))
-    except AppDaily.DoesNotExist:
-        return HttpResponse("have not last info")
-    if info.count() == 0:
-        return HttpResponse(0)
-    return JsonResponse(list(info.values()), safe=False)
-
-
 def get_current_name(request):
     user = request.GET['user']
+    date = timezone.now().date()
     try:
         info = User.objects.get(email=user)
         user_info = {"name": info.name, "permission": info.permission}
         if info.team.name == "app":
             today = AppDaily.objects.filter(date=timezone.now().date()).filter(email=user)
+            past = AppDaily.objects.filter(email=user).filter(
+                date__range=(date - datetime.timedelta(days=3), date - datetime.timedelta(days=1)))
             if today.count() == 0:
                 user_info['today'] = ""
             else:
                 user_info['today'] = list(today.values())
+            if past.count() == 0:
+                user_info['past'] = ""
+            else:
+                user_info['past'] = list(past.values())
     except User.DoesNotExist:
-        return HttpResponse("have not this user")
+        return HttpResponse(-1)
     return JsonResponse(user_info)
 
 
 @csrf_exempt
-def post_daily(request):
-    user = request.POST['user']
-    data = request.POST['data']
-    modify_id = request.POST['modify_id']
-    modify_data = request.POST['modify_data']
+def send_daily(request):
     try:
-        team = User.objects.get(email=user)
-        info = json.loads(data)
-        ids = json.loads(modify_id)
-        if team.team.name == "app":
-            pass
-        if len(info) != 0:
-            for x in info:
+        user = User.objects.get(email=request.POST['user'])
+        data = json.loads(request.POST['data'])
+
+        len_insert = len(data['insert'])
+        len_del = len(data['del'])
+        len_modify = len(data['modify']['id'])
+
+        if len_insert != 0:
+            for x in data['insert']:
                 user_team = AppDaily()
                 user_team.project = x[0]
                 user_team.work_type = x[1]
@@ -92,24 +84,31 @@ def post_daily(request):
                 user_team.person = x[9]
                 user_team.date = datetime.datetime.strptime(x[10], "%Y-%m-%d")
                 user_team.remake = x[11]
-                user_team.email = user
-                user_team.save()
-        else:
-            for i in range(len(ids)):
-                user_team = AppDaily.objects.get(id=ids[i])
-                user_team.project = info[i][0]
-                user_team.work_type = info[i][1]
-                user_team.bugid = info[i][2]
-                user_team.describe = info[i][3]
-                user_team.priority = info[i][4]
-                user_team.reopen = info[i][5]
-                user_team.reopen_reason = info[i][6]
-                user_team.solution = info[i][7]
-                user_team.solution_reason = info[i][8]
-                user_team.remake = info[i][11]
+                user_team.email = user.email
                 user_team.save()
 
+        if len_del != 0:
+            for x in data['del']:
+                AppDaily.objects.get(id=x).delete()
+
+        if len_modify != 0:
+            for i in range(len_modify):
+                AppDaily.objects.filter(id=data['modify']['id'][i]).update(
+                    project=data['modify']['data'][i][0],
+                    work_type=data['modify']['data'][i][1],
+                    bugid=data['modify']['data'][i][2],
+                    describe=data['modify']['data'][i][3],
+                    priority=data['modify']['data'][i][4],
+                    reopen=data['modify']['data'][i][5],
+                    reopen_reason=data['modify']['data'][i][6],
+                    solution=data['modify']['data'][i][7],
+                    solution_reason=data['modify']['data'][i][8],
+                    remake=data['modify']['data'][i][11]
+                )
+
     except User.DoesNotExist:
+        return HttpResponse(-1)
+    except AppDaily.DoesNotExist:
         return HttpResponse(-1)
 
     return HttpResponse(0)

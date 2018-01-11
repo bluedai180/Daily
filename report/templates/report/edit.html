@@ -7,7 +7,6 @@
 </head>
 <body>
 <input type="button" id="statistics" onclick="statistics()" value="统计日报">
-<input type="button" id="modify_today" onclick="modify_today()" value="修改今日已发">
 <input type="button" id="search" onclick="search()" value="搜索">
 <h4>前三天：</h4>
 <style type="text/css">
@@ -124,53 +123,53 @@
             <textarea id="remake"></textarea>
         </td>
         <td>
-            <input id="delete_item" type="button" value="delete"
+            <input id="delete_item" type="button" value="删除"
                    onclick="delete_item(this.parentElement.parentElement.id)">
         </td>
     </tr>
 </table>
 <input id="insert" type="button" value="插入一行" onclick="insert()"><br>
-<input id="submit" type="button" value="提交" onclick="submit_info()">
+<input id="submit" type="button" value="提交日报" onclick="submit_info()">
 {#<script src="../../static/report/edit.js"></script>#}
 <script>
-    console.log(document.cookie);
     var i = 1;
-    var data_old = [];
-    var info_id = [];
+    var old = {
+        id: [],
+        content_id: [],
+        data: []
+    };
     var user = document.cookie.match(/(^| )user=([^;]*)(;|$)/)[2].replace('"', '').replace('"', '');
-    $.get('get_last_info', {"user": user}, function (ret) {
-        if (ret != 0) {
-            show_last(ret);
-        }
-    });
+    var submit_btn = document.getElementById('submit');
+    document.getElementById("date").value = getNowFormatDate();
+
+    var backup = document.getElementById("content_0");
 
     $.get('get_current_name', {"user": user}, function (ret) {
-        console.log(ret);
         document.getElementById("person").value = ret["name"];
         var today = ret['today'];
+        var past = ret['past'];
+
+        if (past != "") {
+            show_last(past);
+        }
+
         if (!ret["permission"]) {
             document.getElementById("statistics").style.display = "none";
         } else if (today != "") {
-            show_today(document.getElementById('content_0').children, today[0]);
-            info_id.push(today[0]['id']);
-            for (var j = 1; j < today.length; j++) {
-                info_id.push(today[j]['id']);
-                insert();
+            submit_btn.value = "提交修改";
+            for (var j = 0; j < today.length; j++) {
+                old.id.push(today[j]['id']);
+                if (j !== 0) {
+                    // 第一行不需要插入
+                    insert();
+                }
                 show_today(document.getElementById('content_' + j.toString()).children, today[j]);
             }
-            var mytable = document.getElementById("today");
-            for (var i = 1, rows = mytable.rows.length; i < rows; i++) {
-                for (var z = 0, cells = mytable.rows[i].cells.length; z < cells; z++) {
-                    if (!data_old[i]) {
-                        data_old[i] = [];
-                    }
-                    data_old[i][z] = mytable.rows[i].cells[z].firstElementChild.value;
-                }
-            }
+            var result = collect_cells(document.getElementById("today"));
+            old.data = result.data;
+            old.content_id = result.content_id;
         }
     });
-
-    document.getElementById("date").value = getNowFormatDate();
 
     function getNowFormatDate() {
         var date = new Date();
@@ -248,59 +247,86 @@
     }
 
     function insert() {
-        var new_node = document.getElementById("content_0").cloneNode(true);
-        new_node.id = "content_" + i.toString();
-        today.appendChild(new_node);
-        i++;
+        if (!document.getElementById("content_0")) {
+            var parent = document.getElementById("today");
+            parent.appendChild(backup);
+        } else {
+            var new_node = document.getElementById("content_0").cloneNode(true);
+            new_node.id = "content_" + i.toString();
+            today.appendChild(new_node);
+            i++;
+        }
     }
 
     function submit_info() {
-        var mytable = document.getElementById("today");
-        var data_new = [];
-        var data = [];
-        var modify_id = [];
-        var modify_data = [];
-        for (var i = 1, rows = mytable.rows.length; i < rows; i++) {
-            for (var j = 0, cells = mytable.rows[i].cells.length; j < cells; j++) {
-                if (!data_new[i]) {
-                    data_new[i] = [];
-                }
-                data_new[i][j] = mytable.rows[i].cells[j].firstElementChild.value;
-            }
-        }
-        if (data_old.length === 0) {
-            data = data_new.slice(1);
-        } else if (data_old.length === data_new.length){
-            for (var z = 0; z < info_id.length; z++) {
-                if (!compare(data_old[z + 1], data_new[z + 1])) {
-                    modify_id.push(info_id[z]);
-                    modify_data.push(data_new[z + 1]);
-                }
-            }
-        } else if (data_old.length < data_new.length) {
-            data.push(data_new.slice(data_old.length));
-        } else if (data_old.length > data_new.length) {
+        // 获取填写的信息
+        var new_info = collect_cells(document.getElementById("today"));
 
-        }
-        if (data_old.length !== 0 && modify_id.length === 0) {
-            alert("内容无修改，提交失败! ");
+        var post_data = {
+            modify: {
+                id: [],
+                data: []
+            },
+            insert: [],
+            del: []
+        };
+
+        // 档没有获取到当日日报内容时，第一次添加日报
+        if (old.id.length === 0) {
+            post_data.insert = new_info.data.slice(1);
+            send_daily(post_data);
             return
         }
 
-        $.post("post_daily", {
-                    "user": user,
-                    "data": JSON.stringify(data),
-                    "modify_id": JSON.stringify(modify_id),
-                    "modify_data": JSON.stringify(modify_data)
-                },
-                function (ret) {
-                    console.log(ret);
-                    if (Number(ret) === 0) {
-                        alert("提交成功！")
-                    } else {
-                        alert("提交失败！")
-                    }
-                });
+        // 对当日日报内容进行了修改
+        for (let i = 0; i < old.id.length; i++) {
+            if (contains(new_info.content_id, old.content_id[i])) {
+                let j = new_info.content_id.indexOf(old.content_id[i]);
+                if (!compare(old.data[i], new_info.data[j])) {
+                    // modify
+                    post_data.modify.id.push(old.id[i]);
+                    post_data.modify.data.push(new_info.data[j]);
+                    console.log("modify " + new_info.data[j]);
+                }
+            } else {
+                // delete
+                post_data.del.push(old.id[i]);
+                console.log("delete " + old.content_id[i])
+            }
+        }
+
+        for (let i = 0; i < new_info.content_id.length; i++) {
+            if (!contains(old.content_id, new_info.content_id[i])) {
+                // insert
+                post_data.insert.push(new_info.data[i]);
+                console.log("insert" + new_info.data[i]);
+            }
+        }
+
+        if (post_data.insert.length === 0 && post_data.del.length === 0 && post_data.modify.id.length === 0) {
+            alert("内容无修改，提交失败！");
+            return
+        }
+        send_daily(post_data);
+    }
+
+    function send_daily(data) {
+        $.post("send_daily", {"user": user, "data": JSON.stringify(data)}, function (ret) {
+            if (Number(ret) === 0) {
+                if (submit_btn.value === "提交日报") {
+                    alert("提交日报成功！");
+                    submit_btn.value = "提交修改";
+                } else {
+                    alert("修改成功！");
+                }
+            } else {
+                if (submit_btn.value === "提交日报") {
+                    alert("提交日报失败！");
+                } else {
+                    alert("修改失败！");
+                }
+            }
+        });
     }
 
     function statistics() {
@@ -315,16 +341,41 @@
         var self = document.getElementById(id);
         var parent = self.parentElement;
         parent.removeChild(self);
+        console.log(parent.childElementCount);
     }
 
-    function modify_today() {
-        window.location.href = "today";
+    function collect_cells(table) {
+        var result = {
+            content_id: [],
+            data: []
+        };
+        for (var i = 1, rows = table.rows.length; i < rows; i++) {
+            result.content_id.push(table.rows[i].id);
+            for (var j = 0, cells = table.rows[i].cells.length - 1; j < cells; j++) {
+                if (!result.data[i]) {
+                    result.data[i] = [];
+                }
+                result.data[i][j] = table.rows[i].cells[j].firstElementChild.value;
+            }
+        }
+        result.data.shift();
+        return result
     }
 
     function compare() {
         for (var i = 0; i < arguments.length; i++) {
             return arguments[i].toString() == arguments[i + 1].toString();
         }
+    }
+
+    function contains(arr, obj) {
+        var i = arr.length;
+        while (i--) {
+            if (arr[i] === obj) {
+                return true;
+            }
+        }
+        return false;
     }
 
 </script>
