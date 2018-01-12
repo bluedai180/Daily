@@ -7,11 +7,25 @@
     <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
 </head>
 <body>
-<p>This is daily report for app team.</p>
-Username: <input type="text" id="username" name="username"><br>
-Password: <input type="password" id="input-password"><br>
+<p>日报统计工具</p>
+邮箱: <input type="text" id="username" name="username"><br>
+密码: <input type="password" id="input-password"><br>
 <input type="hidden" id="md5-password" name="password">
-<input type="button" id="user_login" value="login" onclick="user_login()">
-<script src="../../static/report/login.js"></script>
+<input type="button" id="user_login" value="登陆" onclick="user_login()">
+<script>
+function user_login() {
+    var input_name = document.getElementById('username');
+    var input_pwd = document.getElementById('input-password');
+    var md5_pwd = document.getElementById('md5-password');
+    md5_pwd.value = md5(input_pwd.value);
+    $.get("check_user/", {"id": input_name.value, "pwd": input_pwd.value}, function (ret) {
+        if (ret == 0) {
+            window.location.href = "edit";
+        } else {
+            alert("登陆失败！");
+        }
+    });
+}
+</script>
 </body>
 </html>
