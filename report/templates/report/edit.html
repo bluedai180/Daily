@@ -152,10 +152,10 @@
         if (past != "") {
             show_last(past);
         }
-
         if (!ret["permission"]) {
             document.getElementById("statistics").style.display = "none";
-        } else if (today != "") {
+        } 
+        if (today != "") {
             submit_btn.value = "提交修改";
             for (var j = 0; j < today.length; j++) {
                 old.id.push(today[j]['id']);
@@ -273,7 +273,7 @@
 
         // 档没有获取到当日日报内容时，第一次添加日报
         if (old.id.length === 0) {
-            post_data.insert = new_info.data.slice(1);
+            post_data.insert = new_info.data;
             send_daily(post_data);
             return
         }
