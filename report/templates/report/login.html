@@ -11,21 +11,36 @@
 邮箱: <input type="text" id="username" name="username"><br>
 密码: <input type="password" id="input-password"><br>
 <input type="hidden" id="md5-password" name="password">
+记住密码：<input type="checkbox" id="remember"><br>
 <input type="button" id="user_login" value="登陆" onclick="user_login()">
+
 <script>
-function user_login() {
-    var input_name = document.getElementById('username');
-    var input_pwd = document.getElementById('input-password');
-    var md5_pwd = document.getElementById('md5-password');
-    md5_pwd.value = md5(input_pwd.value);
-    $.get("check_user/", {"id": input_name.value, "pwd": input_pwd.value}, function (ret) {
-        if (ret == 0) {
-            window.location.href = "edit";
-        } else {
-            alert("登陆失败！");
-        }
-    });
-}
+    var user = document.cookie.match(/(^| )user=([^;]*)(;|$)/)[2].replace('"', '').replace('"', '');
+    document.getElementById("username").value = user;
+    var remember = document.cookie.match(/(^| )remember=([^;]*)(;|$)/);
+
+    if (remember === null){
+        document.cookie = "remember=false"
+    }
+    if (remember[2].replace('"', '').replace('"', '') === "true") {
+        window.location.href = 'edit';
+    }
+
+    function user_login() {
+        var input_name = document.getElementById('username');
+        var input_pwd = document.getElementById('input-password');
+        var md5_pwd = document.getElementById('md5-password');
+        md5_pwd.value = md5(input_pwd.value);
+        document.cookie = "remember=" + document.getElementById('remember').checked.toString();
+
+        $.get("check_user/", {"id": input_name.value, "pwd": input_pwd.value}, function (ret) {
+            if (ret == 0) {
+                window.location.href = "edit";
+            } else {
+                alert("登陆失败！");
+            }
+        });
+    }
 </script>
 </body>
 </html>

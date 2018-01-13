@@ -8,6 +8,7 @@
 <body>
 <input type="button" id="statistics" onclick="statistics()" value="统计日报">
 <input type="button" id="search" onclick="search()" value="搜索">
+<input type="button" id="logout" onclick="logout()" value="登出账号">
 <h4>前三天：</h4>
 <style type="text/css">
     .AutoNewline {
@@ -376,6 +377,11 @@
             }
         }
         return false;
+    }
+
+    function logout() {
+        document.cookie = "remember=false";
+        window.location.href = 'login';
     }
 
 </script>
