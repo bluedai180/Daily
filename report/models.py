@@ -19,7 +19,7 @@ class User(models.Model):
         return self.email
 
 
-class AppDaily(models.Model):
+class SoftDaily(models.Model):
     project = models.CharField(max_length=200, blank=True, null=True)
     work_type = models.CharField(max_length=50, blank=True, null=True)
     bugid = models.CharField(max_length=50, blank=True, null=True)
@@ -36,3 +36,18 @@ class AppDaily(models.Model):
 
     def __str__(self):
         return self.describe
+
+    class Meta:
+        abstract = True
+
+
+class AppDaily(SoftDaily):
+    pass
+
+
+class FrameworkDaily(SoftDaily):
+    pass
+
+
+class DriverDaily(SoftDaily):
+    pass

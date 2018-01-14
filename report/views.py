@@ -1,6 +1,7 @@
 from django.shortcuts import render
 
-from .models import User, Team, AppDaily
+from report.app.team import TeamUtils
+from .models import User
 from .excel import Excel
 from django.http import HttpResponse, JsonResponse, StreamingHttpResponse
 from django.utils import timezone
@@ -42,18 +43,18 @@ def get_current_name(request):
     try:
         info = User.objects.get(email=user)
         user_info = {"name": info.name, "permission": info.permission}
-        if info.team.name == "app":
-            today = AppDaily.objects.filter(date=timezone.now().date()).filter(email=user)
-            past = AppDaily.objects.filter(email=user).filter(
-                date__range=(date - datetime.timedelta(days=3), date - datetime.timedelta(days=1)))
-            if today.count() == 0:
-                user_info['today'] = ""
-            else:
-                user_info['today'] = list(today.values())
-            if past.count() == 0:
-                user_info['past'] = ""
-            else:
-                user_info['past'] = list(past.values())
+        daily = TeamUtils.get_team_daily(info.team.name)
+        today_info = daily.objects.filter(date=timezone.now().date()).filter(email=user)
+        past = daily.objects.filter(email=user).filter(
+            date__range=(date - datetime.timedelta(days=3), date - datetime.timedelta(days=1)))
+        if today_info.count() == 0:
+            user_info['today'] = ""
+        else:
+            user_info['today'] = list(today_info.values())
+        if past.count() == 0:
+            user_info['past'] = ""
+        else:
+            user_info['past'] = list(past.values())
     except User.DoesNotExist:
         return HttpResponse(-1)
     return JsonResponse(user_info)
@@ -69,9 +70,11 @@ def send_daily(request):
         len_del = len(data['del'])
         len_modify = len(data['modify']['id'])
 
+        daily = TeamUtils.get_team_daily(user.team.name)
+
         if len_insert != 0:
             for x in data['insert']:
-                user_team = AppDaily()
+                user_team = daily()
                 user_team.project = x[0]
                 user_team.work_type = x[1]
                 user_team.bugid = x[2]
@@ -89,11 +92,11 @@ def send_daily(request):
 
         if len_del != 0:
             for x in data['del']:
-                AppDaily.objects.get(id=x).delete()
+                daily.objects.get(id=x).delete()
 
         if len_modify != 0:
             for i in range(len_modify):
-                AppDaily.objects.filter(id=data['modify']['id'][i]).update(
+                daily.objects.filter(id=data['modify']['id'][i]).update(
                     project=data['modify']['data'][i][0],
                     work_type=data['modify']['data'][i][1],
                     bugid=data['modify']['data'][i][2],
@@ -108,7 +111,7 @@ def send_daily(request):
 
     except User.DoesNotExist:
         return HttpResponse(-1)
-    except AppDaily.DoesNotExist:
+    except daily.DoesNotExist:
         return HttpResponse(-1)
 
     return HttpResponse(0)
@@ -122,20 +125,20 @@ def collect(request):
     team = request.GET['team']
     list_info_today.clear()
     try:
-        if team == "app":
-            daily = AppDaily.objects.filter(date=timezone.now().date())
-            if daily.count() == 0:
-                return HttpResponse(0)
-            current_user = [x['email'] for x in daily.values('email').distinct()]
-            team_user = [x.email for x in User.objects.filter(team__name='app')]
-            ret_list = []
-            for x in list(set(current_user) ^ set(team_user)):
-                ret_list.append(User.objects.get(email=x).name)
-            for x in daily.values_list():
-                list_info_today.append(list(x)[1:-1])
-    except AppDaily.DoesNotExist:
+        daily = TeamUtils.get_team_daily(team)
+        today_all = daily.objects.filter(date=timezone.now().date())
+        if today_all.count() == 0:
+            return HttpResponse(0)
+        current_user = [x['email'] for x in today_all.values('email').distinct()]
+        team_user = [x.email for x in User.objects.filter(team__name='app')]
+        ret_list = []
+        for x in list(set(current_user) ^ set(team_user)):
+            ret_list.append(User.objects.get(email=x).name)
+        for x in today_all.values_list():
+            list_info_today.append(list(x)[1:-1])
+    except daily.DoesNotExist:
         return HttpResponse(-1)
-    info = {'info': list(daily.values()), 'name': ret_list}
+    info = {'info': list(today_all.values()), 'name': ret_list}
     return JsonResponse(info, safe=False)
 
 
@@ -167,25 +170,27 @@ def search(request):
 def search_info(request):
     list_info_result.clear()
     info = json.loads(request.GET['info'])
-    if info['team'] == "app":
-        worktype = info['worktype']
-        bugid = info['bugid']
-        describe = info['describe']
-        solution = info['solution']
-        start_date = info['start_date']
-        end_date = info['end_date']
-        user = info['user']
-        result = AppDaily.objects.filter(work_type=worktype)
-        if bugid != "":
-            result = result.filter(bugid=bugid)
-        elif describe != "":
-            result = result.filter(describe=describe)
-        elif solution != "":
-            result = result.filter(solution=solution)
-        elif start_date != "" and end_date != "":
-            result = result.filter(date__range=(start_date, end_date))
-        elif user != "":
-            result = result.filter(email=user)
+
+    daily = TeamUtils.get_team_daily(info['team'])
+
+    worktype = info['worktype']
+    bugid = info['bugid']
+    describe = info['describe']
+    solution = info['solution']
+    start_date = info['start_date']
+    end_date = info['end_date']
+    user = info['user']
+    result = daily.objects.filter(work_type=worktype)
+    if bugid != "":
+        result = result.filter(bugid=bugid)
+    elif describe != "":
+        result = result.filter(describe=describe)
+    elif solution != "":
+        result = result.filter(solution=solution)
+    elif start_date != "" and end_date != "":
+        result = result.filter(date__range=(start_date, end_date))
+    elif user != "":
+        result = result.filter(email=user)
 
     for x in result.values_list():
         list_info_result.append(list(x)[1:-1])
