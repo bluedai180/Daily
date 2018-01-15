@@ -1,13 +1,14 @@
-from django.shortcuts import render
-
-from report.app.team import TeamUtils
-from .models import User
-from .excel import Excel
-from django.http import HttpResponse, JsonResponse, StreamingHttpResponse
-from django.utils import timezone
-from django.views.decorators.csrf import csrf_exempt
 import datetime
 import json
+
+from django.http import HttpResponse, JsonResponse, StreamingHttpResponse
+from django.shortcuts import render
+from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
+
+from report.app.excel import Excel
+from report.app.team import TeamUtils
+from .models import User
 
 list_info_today = []
 list_info_result = []

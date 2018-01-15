@@ -51,3 +51,7 @@ class FrameworkDaily(SoftDaily):
 
 class DriverDaily(SoftDaily):
     pass
+
+
+class ProtocolDaily(SoftDaily):
+    pass

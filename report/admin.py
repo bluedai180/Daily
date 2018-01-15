@@ -1,8 +1,6 @@
 from django.contrib import admin
 
-from django.contrib import admin
-
-from .models import Team, User, AppDaily, FrameworkDaily, DriverDaily
+from .models import Team, User, AppDaily, FrameworkDaily, DriverDaily, ProtocolDaily
 
 
 class UserAdmin(admin.ModelAdmin):
@@ -19,3 +17,4 @@ admin.site.register(User, UserAdmin)
 admin.site.register(AppDaily, DailyAdmin)
 admin.site.register(FrameworkDaily, DailyAdmin)
 admin.site.register(DriverDaily, DailyAdmin)
+admin.site.register(ProtocolDaily, DailyAdmin)

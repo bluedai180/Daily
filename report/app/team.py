@@ -1,4 +1,4 @@
-from report.models import AppDaily, FrameworkDaily, DriverDaily
+from report.models import AppDaily, FrameworkDaily, DriverDaily, ProtocolDaily
 
 
 class TeamUtils:
@@ -14,3 +14,5 @@ class TeamUtils:
             return FrameworkDaily
         elif user == "driver":
             return DriverDaily
+        elif user == "protocol":
+            return ProtocolDaily
