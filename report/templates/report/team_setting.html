@@ -3,19 +3,183 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
 </head>
 <body>
-<h1>setting</h1>
-<p>member setting</p>
-<table id="member" border="1" cellpadding="0" cellspacing="0">
-</table><br>
-<p>insert new member</p>
-username : <input type="text" id="user_name">
-password : <input type="text" id="pwd">
-<input type="button" value="save" onclick="save()"><br>
-<p>authority setting</p>
+<h1>设置</h1>
+<h3>成员设置</h3>
 
-<p>email setting</p>
-<script src="../../static/report/team_setting.js"></script>
+<table id="member" border="1" cellpadding="10" cellspacing="0">
+    <tr>
+        <th>ID</th>
+        <th>姓名</th>
+        <th>Email</th>
+        <th>密码</th>
+        <th>日报权限</th>
+        <th>操作</th>
+    </tr>
+</table>
+<br><input type="button" value="保存修改" onclick="save_modify()">
+<br>
+<h3>添加新成员</h3>
+姓名 : <input type="text" id="user_name"><br>
+密码 : <input type="text" id="pwd"><br>
+邮箱 : <input type="email" id="email"><br>
+权限 : <input type="checkbox" id="permission"><br><br>
+<input type="button" value="保存" onclick="save()"><br>
+<script>
+    var old = {
+        id: [],
+        permission: []
+    };
+
+    var team = document.cookie.match(/(^| )team=([^;]*)(;|$)/)[2];
+    var member = document.getElementById("member");
+
+    get_team_user();
+
+    function get_team_user() {
+        $.get("get_team_user", {"team": team}, function (ret) {
+            show_team_user(ret);
+        });
+    }
+
+    function show_team_user(ret) {
+        for (let i = 0; i < ret.length; i++) {
+            insert_table_user(member, ret[i]);
+        }
+    }
+
+    function insert_table_user(table, data) {
+        var line = document.createElement("tr");
+        var id = document.createElement("td");
+        var names = document.createElement("td");
+        var email = document.createElement("td");
+        var password = document.createElement("td");
+        var option = document.createElement("td");
+        var del = document.createElement("td");
+        var permission = document.createElement("input");
+        permission.type = "checkbox";
+        permission.checked = data["permission"];
+        old.permission.push(data["permission"]);
+        var btn = document.createElement("input");
+        btn.type = "button";
+        btn.onclick = function () {
+            // delete
+            this.parentNode.parentNode.parentNode.removeChild(this.parentNode.parentNode);
+        };
+        btn.value = "删除";
+
+        id.innerText = data["id"];
+        old.id.push(data["id"]);
+        names.innerText = data["name"];
+        email.innerText = data["email"];
+        password.innerText = data["pwd"];
+
+        line.appendChild(id);
+        line.appendChild(names);
+        line.appendChild(email);
+        line.appendChild(password);
+        option.appendChild(permission);
+        del.appendChild(btn);
+        line.appendChild(option);
+        line.appendChild(del);
+        table.appendChild(line);
+    }
+
+    function save_modify() {
+        var result = collect_cells(document.getElementById("member"));
+        var modify_info = {
+            modify: {
+                id: [],
+                permission: []
+            },
+            del: [],
+        };
+        for (let i = 0; i < old.id.length; i++) {
+            if (!contains(result.id, old.id[i])) {
+                // delete
+                modify_info.del.push(old.id[i]);
+                console.log(old.id[i])
+            } else {
+                if (old.permission[i].toString() !== result.permission[result.id.indexOf(old.id[i])].toString()) {
+                    // modify
+                    console.log("modify " + old.id[i]);
+                    modify_info.modify.id.push(old.id[i]);
+                    modify_info.modify.permission.push(result.permission[result.id.indexOf(old.id[i])]);
+                }
+            }
+        }
+        if (modify_info.modify.id.length === 0 && modify_info.del.length === 0) {
+            alert("无修改！");
+            return
+        }
+        modify_user(modify_info);
+    }
+
+
+    function save() {
+        var username = document.getElementById("user_name").value;
+        var pwd = document.getElementById("pwd").value;
+        var email = document.getElementById("email").value;
+        var permission = document.getElementById("permission").checked;
+
+        if (username === "" && pwd === "" && email === "") {
+            alert("请完整填入信息");
+            return
+        }
+
+        var user = {
+            "name": username,
+            "pwd": pwd,
+            "email": email,
+            "permission": permission,
+            "team": team
+        };
+        insert_user(user);
+    }
+
+    function collect_cells(table) {
+        var result = {
+            id: [],
+            permission: []
+        };
+        for (var i = 1, rows = table.rows.length; i < rows; i++) {
+            result.id.push(Number((table.rows[i].cells[0]).innerText));
+            result.permission.push((table.rows[i].cells[4]).firstElementChild.checked)
+        }
+        return result
+    }
+
+    function contains(arr, obj) {
+        var i = arr.length;
+        while (i--) {
+            if (arr[i] === obj) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function insert_user(user) {
+        $.post("insert_user", {"data": JSON.stringify(user)}, function (ret) {
+            console.log(ret);
+            if (Number(ret) !== -1) {
+                alert("添加成功！");
+                user.id = Number(ret);
+                insert_table_user(member, user)
+            }
+        });
+    }
+
+    function modify_user(info) {
+        $.post("modify_user", {"data": JSON.stringify(info)}, function (ret) {
+            if (Number(ret) === 0) {
+                alert("修改成功！");
+            }
+        });
+    }
+
+</script>
 </body>
 </html>

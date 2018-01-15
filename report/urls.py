@@ -16,5 +16,9 @@ urlpatterns = [
     path('search', views.search, name='search'),
     path('search_info', views.search_info, name="search_info"),
     path('download_search', views.download_search, name="download_search"),
-    path('today', views.today, name="today")
+    path('today', views.today, name="today"),
+    path('settings', views.settings, name="settings"),
+    path('get_team_user', views.get_team_user, name="get_team_user"),
+    path('insert_user', views.insert_user, name="insert_user"),
+    path('modify_user', views.modify_user, name="modify_user")
 ]

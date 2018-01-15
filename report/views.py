@@ -8,7 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from report.app.excel import Excel
 from report.app.team import TeamUtils
-from .models import User
+from .models import User, Team
 
 list_info_today = []
 list_info_result = []
@@ -224,3 +224,53 @@ def download_search(request):
 
 def today(request):
     return render(request, 'report/today.html')
+
+
+def settings(request):
+    return render(request, 'report/team_setting.html')
+
+
+def get_team_user(request):
+    team = request.GET['team']
+
+    try:
+        users = User.objects.filter(team__name=team)
+
+    except User.DoesNotExist:
+        return HttpResponse(-1)
+
+    return JsonResponse(list(users.values()), safe=False)
+
+
+@csrf_exempt
+def insert_user(request):
+    user = json.loads(request.POST['data'])
+    try:
+        new_user = User()
+        new_user.name = user["name"]
+        new_user.email = user["email"]
+        new_user.pwd = user["pwd"]
+        new_user.team = Team.objects.get(name=user["team"])
+        new_user.save()
+    except User.DoesNotExist:
+        return HttpResponse(-1)
+
+    return HttpResponse(new_user.id)
+
+
+@csrf_exempt
+def modify_user(request):
+    user = json.loads(request.POST['data'])
+    try:
+        length_modify = len(user['modify']['id'])
+
+        if len(user['del']) != 0:
+            for x in user['del']:
+                User(id=x).delete()
+        if length_modify != 0:
+            for i in range(length_modify):
+                user = User.objects.filter(id=user['modify']['id'][i]).update(
+                    permission=user['modify']['permission'][i])
+    except User.DoesNotExist:
+        return HttpResponse(-1)
+    return HttpResponse(0)
