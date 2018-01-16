@@ -6,8 +6,9 @@
     <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
 </head>
 <body>
-<p>搜索已发日报</p>
+<h1>搜索</h1>
 工作类型: <select id="work_type">
+    <option></option>
     <option>解决bug</option>
     <option>非bug库问题处理</option>
     <option>基线升级</option>
@@ -40,72 +41,95 @@ Bug ID: <input id="search_bugid" type="text"><br>
 </select><br>
 起始日期: <input id="start_date" type="date"><br>
 结束日期: <input id="end_date" type="date"><br>
-责任人: <input id="user" type="email"><br><br>
-<input id="search" type="button" value="search" onclick="search()">
-
-<p>搜索结果：</p>
-<input onclick="download()" value="download excel" type="button"><br><br>
+责任人: <input id="user" type="email">(空白默认全组成员)<br><br>
+<input id="search" type="button" value="查询" onclick="search()">
 <style type="text/css">
     .AutoNewline {
         Word-break: break-all;
     }
 </style>
-<table class="AutoNewline" id="result" border="1" cellpadding="0" cellspacing="0">
-    <tr>
-        <th>项目</th>
-        <th>工作类型</th>
-        <th>Bug ID</th>
-        <th>简要描述</th>
-        <th>优先级</th>
-        <th>是否reopen</th>
-        <th>reopen原因</th>
-        <th>解决方案</th>
-        <th>原因</th>
-        <th>责任人</th>
-        <th>日期</th>
-        <th>备注</th>
-    </tr>
-</table>
+<div id="result_div" style="display: none">
+    <h3>搜索结果：</h3>
+    <table class="AutoNewline" id="result" border="1" cellpadding="10" cellspacing="0">
+        <tr>
+            <th>项目</th>
+            <th>工作类型</th>
+            <th>Bug ID</th>
+            <th>简要描述</th>
+            <th>优先级</th>
+            <th>是否reopen</th>
+            <th>reopen原因</th>
+            <th>解决方案</th>
+            <th>原因</th>
+            <th>责任人</th>
+            <th>日期</th>
+            <th>备注</th>
+        </tr>
+    </table><br>
+    <input onclick="download()" value="导出Excel文件" type="button"><br>
+</div>
+
+<p id="none_result" style="display: none">查询无结果!</p>
 {#<script src="../../static/report/search.js"></script>#}
 <script>
     var team = document.cookie.match(/(^| )team=([^;]*)(;|$)/)[2];
 
     function search() {
+        var work_type = document.getElementById("work_type").value;
+        var search_bugid = document.getElementById("search_bugid").value;
+        var search_describe = document.getElementById("search_describe").value;
+        var solution = document.getElementById("solution").value;
+        var solution_reason = document.getElementById("solution_reason").value;
+        var start_date = document.getElementById("start_date").value;
+        var end_date = document.getElementById("end_date").value;
+        var user = document.getElementById("user").value;
 
-        if ("" === document.getElementById("work_type").value) {
-            alert("工作类型不能为空！");
+        if ("" === work_type
+                && "" === search_bugid
+                && "" === search_describe
+                && "" === solution
+                && "" === solution_reason
+                && "" === start_date
+                && "" === end_date
+                && "" === user) {
+            alert("搜索内容不能为空！");
             return
         }
 
-        if (("" === document.getElementById("start_date").value && "" !== document.getElementById("end_date").value) ||
-            ("" === document.getElementById("end_date").value && "" !== document.getElementById("start_date").value)) {
+        if (("" === start_date && "" !== end_date) || ("" === end_date && "" !== start_date)) {
             alert("起始、终止日期要填全！");
             return
         }
 
         var info = {
             team: team,
-            worktype: document.getElementById("work_type").value,
-            bugid: document.getElementById("search_bugid").value,
-            describe: document.getElementById("search_describe").value,
-            solution: document.getElementById("solution_reason").value,
-            start_date: document.getElementById("start_date").value,
-            end_date: document.getElementById("end_date").value,
-            user: document.getElementById("user").value
+            worktype: work_type,
+            bugid: search_bugid,
+            describe: search_describe,
+            solution: solution_reason,
+            start_date: start_date,
+            end_date: end_date,
+            user: user
         };
         $.get('search_info', {"info": JSON.stringify(info)}, function (ret) {
-            if (ret != 0){
+            if (ret != 0) {
+                document.getElementById("result_div").style.display = "";
+                document.getElementById("none_result").style.display = "none";
                 show_result(ret);
+            } else {
+                document.getElementById("none_result").style.display = "";
+                document.getElementById("result_div").style.display = "none";
             }
         })
     }
 
     function show_result(ret) {
         var result = document.getElementById("result");
-        $("#result").find("tr:not(:first)").empty("");
-        console.log(result.children);
+        console.log(result.childNodes);
+        {#        $("#result").find("tr:not(:first)").empty("");#}
         for (var i = 0; i < ret.length; i++) {
             var line = document.createElement("tr");
+            line.id = "result_" + i;
             var cell_project = document.createElement("td");
             var cell_work_type = document.createElement("td");
             var cell_bugid = document.createElement("td");

@@ -177,9 +177,7 @@ def search(request):
 def search_info(request):
     list_info_result.clear()
     info = json.loads(request.GET['info'])
-
     daily = TeamUtils.get_team_daily(info['team'])
-
     worktype = info['worktype']
     bugid = info['bugid']
     describe = info['describe']
@@ -187,16 +185,18 @@ def search_info(request):
     start_date = info['start_date']
     end_date = info['end_date']
     user = info['user']
-    result = daily.objects.filter(work_type=worktype)
+    result = daily.objects
+    if worktype != "":
+        result = result.filter(work_type=worktype)
     if bugid != "":
-        result = result.filter(bugid=bugid)
-    elif describe != "":
-        result = result.filter(describe=describe)
-    elif solution != "":
+        result = result.filter(bugid__icontains=bugid)
+    if describe != "":
+        result = result.filter(describe__icontains=describe)
+    if solution != "":
         result = result.filter(solution=solution)
-    elif start_date != "" and end_date != "":
+    if start_date != "" and end_date != "":
         result = result.filter(date__range=(start_date, end_date))
-    elif user != "":
+    if user != "":
         result = result.filter(email=user)
 
     for x in result.values_list():
