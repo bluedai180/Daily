@@ -134,6 +134,12 @@
 <input id="submit" type="button" value="提交日报" onclick="submit_info()">
 {#<script src="../../static/report/edit.js"></script>#}
 <script>
+    // 禁止后退到登录界面，退出登录只能通过“登出用户”按钮
+    history.pushState(null, null, document.URL);
+    window.addEventListener('popstate', function () {
+        history.pushState(null, null, document.URL);
+    });
+
     var i = 1;
     var old = {
         id: [],
@@ -147,7 +153,7 @@
         alert("请先登录!");
         window.location.href = 'login';
     }
-{#    var user = document.cookie.match(/(^| )user=([^;]*)(;|$)/)[2].replace('"', '').replace('"', '');#}
+    {#    var user = document.cookie.match(/(^| )user=([^;]*)(;|$)/)[2].replace('"', '').replace('"', '');#}
     var submit_btn = document.getElementById('submit');
     document.getElementById("date").value = getNowFormatDate();
 
@@ -164,7 +170,7 @@
         if (ret["permission"]) {
             document.getElementById("statistics").style.display = "";
             document.getElementById("settings").style.display = "";
-        } 
+        }
         if (today != "") {
             submit_btn.value = "提交修改";
             for (var j = 0; j < today.length; j++) {
