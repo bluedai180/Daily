@@ -7,8 +7,14 @@
 </head>
 <body>
 <h1>设置</h1>
-<h3>成员设置</h3>
+<h3>添加新成员</h3>
+姓名 : <input type="text" id="user_name"><br>
+密码 : <input type="text" id="pwd"><br>
+邮箱 : <input type="email" id="email"><br>
+权限 : <input type="checkbox" id="permission"><br><br>
+<input type="button" value="保存" onclick="save()"><br><br>
 
+<h3>成员设置</h3>
 <table id="member" border="1" cellpadding="10" cellspacing="0">
     <tr>
         <th>ID</th>
@@ -21,12 +27,6 @@
 </table>
 <br><input type="button" value="保存修改" onclick="save_modify()">
 <br>
-<h3>添加新成员</h3>
-姓名 : <input type="text" id="user_name"><br>
-密码 : <input type="text" id="pwd"><br>
-邮箱 : <input type="email" id="email"><br>
-权限 : <input type="checkbox" id="permission"><br><br>
-<input type="button" value="保存" onclick="save()"><br>
 <script>
     var old = {
         id: [],
