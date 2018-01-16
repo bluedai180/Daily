@@ -18,6 +18,12 @@ def login(request):
     return render(request, 'report/login.html')
 
 
+def logout(request):
+    response = HttpResponse(0)
+    response.delete_cookie("user")
+    return response
+
+
 def check_user(request):
     id = request.GET['id']
     pwd = request.GET['pwd']

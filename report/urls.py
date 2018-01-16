@@ -6,6 +6,7 @@ app_name = 'report'
 
 urlpatterns = [
     path('login', views.login, name='login'),
+    path('logout', views.logout, name='logout'),
     path('check_user/', views.check_user, name='check_user'),
     path('edit', views.edit, name='edit'),
     path('get_current_name', views.get_current_name, name='get_current_name'),

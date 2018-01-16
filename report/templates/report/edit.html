@@ -6,8 +6,8 @@
     <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
 </head>
 <body>
-<input type="button" id="statistics" onclick="statistics()" value="统计日报">
-<input type="button" name="settings" onclick="setting()" value="设置">
+<input type="button" id="statistics" onclick="statistics()" value="统计日报" style="display: none">
+<input type="button" id="settings" onclick="setting()" value="设置" style="display: none">
 <input type="button" id="search" onclick="search()" value="搜索">
 <input type="button" id="logout" onclick="logout()" value="登出账号">
 <h4>前三天：</h4>
@@ -140,7 +140,14 @@
         content_id: [],
         data: []
     };
-    var user = document.cookie.match(/(^| )user=([^;]*)(;|$)/)[2].replace('"', '').replace('"', '');
+
+    try {
+        var user = document.cookie.match(/(^| )user=([^;]*)(;|$)/)[2].replace('"', '').replace('"', '');
+    } catch (e) {
+        alert("请先登录!");
+        window.location.href = 'login';
+    }
+{#    var user = document.cookie.match(/(^| )user=([^;]*)(;|$)/)[2].replace('"', '').replace('"', '');#}
     var submit_btn = document.getElementById('submit');
     document.getElementById("date").value = getNowFormatDate();
 
@@ -154,9 +161,9 @@
         if (past != "") {
             show_last(past);
         }
-        if (!ret["permission"]) {
-            document.getElementById("statistics").style.display = "none";
-            document.getElementsByName("settings").style.display = "none";
+        if (ret["permission"]) {
+            document.getElementById("statistics").style.display = "";
+            document.getElementById("settings").style.display = "";
         } 
         if (today != "") {
             submit_btn.value = "提交修改";
@@ -386,6 +393,7 @@
 
     function logout() {
         document.cookie = "remember=false";
+        $.get('logout');
         window.location.href = 'login';
     }
 

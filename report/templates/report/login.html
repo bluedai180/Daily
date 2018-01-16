@@ -7,23 +7,21 @@
     <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
 </head>
 <body>
-<p>日报统计工具</p>
-邮箱: <input type="text" id="username" name="username"><br>
-密码: <input type="password" id="input-password"><br>
-<input type="hidden" id="md5-password" name="password">
-记住密码：<input type="checkbox" id="remember"><br>
-<input type="button" id="user_login" value="登陆" onclick="user_login()">
+<div id="login" style="visibility: hidden">
+    <p>日报统计工具</p>
+    邮箱: <input type="text" id="username" name="username"><br>
+    密码: <input type="password" id="input-password"><br>
+    <input type="hidden" id="md5-password" name="password">
+    <input type="checkbox" id="remember"> 下次自动登录<br>
+    <input type="button" id="user_login" value="登陆" onclick="user_login()">
+</div>
 
 <script>
-    var user = document.cookie.match(/(^| )user=([^;]*)(;|$)/)[2].replace('"', '').replace('"', '');
-    document.getElementById("username").value = user;
     var remember = document.cookie.match(/(^| )remember=([^;]*)(;|$)/);
-
-    if (remember === null) {
-        document.cookie = "remember=false"
-    }
-    if (remember[2].replace('"', '').replace('"', '') === "true") {
+    if (remember !== null && remember[2].replace('"', '').replace('"', '') === "true") {
         window.location.href = 'edit';
+    } else {
+        document.getElementById("login").style.visibility = "visible";
     }
 
     function user_login() {
