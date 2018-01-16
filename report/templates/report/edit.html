@@ -318,9 +318,10 @@
             if (Number(ret) === 0) {
                 if (submit_btn.value === "提交日报") {
                     alert("提交日报成功！");
-                    submit_btn.value = "提交修改";
+                    window.location.reload();
                 } else {
                     alert("修改成功！");
+                    window.location.reload();
                 }
             } else {
                 if (submit_btn.value === "提交日报") {
