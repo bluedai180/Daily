@@ -6,33 +6,36 @@
     <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
 </head>
 <body>
-<h1>以下人员未发日报：</h1>
+<h1>统计日报</h1>
+<h3>以下人员未发日报：</h3>
 <p id="unbilled_user"></p>
-<h1>汇总日报：</h1>
 <style type="text/css">
     .AutoNewline {
         Word-break: break-all;
     }
 </style>
-<table class="AutoNewline" id="collection" border="1" cellpadding="10" cellspacing="0">
-    <tr>
-        <th>项目</th>
-        <th>工作类型</th>
-        <th>Bug ID</th>
-        <th>简要描述</th>
-        <th>优先级</th>
-        <th>是否reopen</th>
-        <th>reopen原因</th>
-        <th>解决方案</th>
-        <th>原因</th>
-        <th>责任人</th>
-        <th>日期</th>
-        <th>备注</th>
-    </tr>
-</table>
-<br><br>
-{#<input id="send_email" onclick="send()" type="button" value="send email">#}
-<input id="download" onclick="download()" type="button" value="导出成Excel文件">
+<div id="collect_div" style="display: none">
+    <h3>汇总日报：</h3>
+    <table class="AutoNewline" id="collection" border="1" cellpadding="10" cellspacing="0">
+        <tr>
+            <th>项目</th>
+            <th>工作类型</th>
+            <th>Bug ID</th>
+            <th>简要描述</th>
+            <th>优先级</th>
+            <th>是否reopen</th>
+            <th>reopen原因</th>
+            <th>解决方案</th>
+            <th>原因</th>
+            <th>责任人</th>
+            <th>日期</th>
+            <th>备注</th>
+        </tr>
+    </table>
+    <br><br>
+    <input id="download" onclick="download()" type="button" value="导出成Excel文件">
+</div>
+
 {#<script src="../../static/report/collect.js"></script>#}
 <script>
     var team = document.cookie.match(/(^| )team=([^;]*)(;|$)/)[2];
@@ -42,6 +45,9 @@
         if (ret != 0) {
             show_today(ret.info);
             document.getElementById("unbilled_user").innerText = ret.name.join(", ");
+            document.getElementById('collect_div').style.display = '';
+        } else {
+            document.getElementById("unbilled_user").innerText = "目前全部未发日报！";
         }
     });
 
