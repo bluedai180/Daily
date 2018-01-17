@@ -85,8 +85,9 @@ Bug ID: <input id="search_bugid" type="text"><br>
 
     var total_pages = 0;
     var current_page = 1;
+    var table_length = 20;
 
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < table_length; i++) {
         var line = document.createElement('tr');
         line.id = "line_" + i.toString();
         for (let j = 0; j < 12; j++) {
@@ -155,11 +156,9 @@ Bug ID: <input id="search_bugid" type="text"><br>
     function show_result(ret) {
 
         var ret_length = ret.length;
-        var table_length = 3;
-
         if (ret_length != table_length) {
-            for (let i = 3 - ret_length; i > 0; i--) {
-                document.getElementById("line_" + (3 - i)).style.display = 'none';
+            for (let i = table_length - ret_length; i > 0; i--) {
+                document.getElementById("line_" + (table_length - i)).style.display = 'none';
             }
         } else {
             for (let i = 0; i < table_length; i++) {
