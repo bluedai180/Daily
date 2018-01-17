@@ -8,7 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from report.app.excel import Excel
 from report.app.team import TeamUtils
-from .models import User, Team
+from .models import User, Team, Project
 
 list_info_today = []
 list_info_result = []
@@ -22,6 +22,16 @@ def logout(request):
     response = HttpResponse(0)
     response.delete_cookie("user")
     return response
+
+
+def get_projects(request):
+    team = request.GET['team']
+
+    try:
+        projects = Project.objects.filter(team__name=team)
+    except Project.DoesNotExist:
+        return HttpResponse(-1)
+    return JsonResponse(list(projects.values('id', 'name')), safe=False)
 
 
 def check_user(request):
@@ -280,3 +290,28 @@ def modify_user(request):
     except User.DoesNotExist:
         return HttpResponse(-1)
     return HttpResponse(0)
+
+
+@csrf_exempt
+def delete_projects(request):
+    ids = json.loads(request.POST['data'])
+    try:
+        for x in ids:
+            Project.objects.get(id=x).delete()
+    except Project.DoesNotExist:
+        return HttpResponse(-1)
+    return HttpResponse(0)
+
+
+@csrf_exempt
+def insert_project(request):
+    team = request.POST['team']
+    data = request.POST['data']
+    try:
+        project = Project()
+        project.name = data
+        project.team = Team.objects.get(name=team)
+        project.save()
+    except Project.DoesNotExist:
+        return HttpResponse(-1)
+    return HttpResponse(project.id)

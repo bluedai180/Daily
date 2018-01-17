@@ -7,15 +7,15 @@
 </head>
 <body>
 <h1>设置</h1>
-<h3>添加新成员</h3>
+<h3>1. 添加新成员</h3>
 姓名 : <input type="text" id="user_name"><br>
 密码 : <input type="text" id="pwd"><br>
 邮箱 : <input type="email" id="email"><br>
 权限 : <input type="checkbox" id="permission"><br><br>
 <input type="button" value="保存" onclick="save()"><br><br>
 
-<h3>成员设置</h3>
-<table id="member" border="1" cellpadding="10" cellspacing="0">
+<h3>2. 成员设置</h3>
+<table id="member" border="1" cellpadding="5" cellspacing="0">
     <tr>
         <th>ID</th>
         <th>姓名</th>
@@ -26,15 +26,31 @@
     </tr>
 </table>
 <br><input type="button" value="保存修改" onclick="save_modify()">
-<br>
+<br><br>
+
+<h3>3. 日报项目名管理</h3>
+新项目名：<input type="text" id="new_project">
+<input type="button" onclick="save_project()" value="保存"><br><br>
+<table id="projects" border="1" cellpadding="5" cellspacing="0">
+    <tr>
+        <th>ID</th>
+        <th>名称</th>
+        <th>操作</th>
+    </tr>
+</table><br>
+<input type="button" onclick="modify_project()" value="确定删除"><br><br>
+
 <script>
     var old = {
         id: [],
         permission: []
     };
 
+    var old_projects = [];
+
     var team = document.cookie.match(/(^| )team=([^;]*)(;|$)/)[2];
     var member = document.getElementById("member");
+    var projects = document.getElementById("projects");
 
     get_team_user();
 
@@ -178,6 +194,74 @@
                 alert("修改成功！");
             }
         });
+    }
+
+    $.get('get_projects', {"team": team}, function (ret) {
+        for (let i = 0; i < ret.length; i++) {
+            projects.appendChild(insert_projects(ret[i]));
+        }
+    });
+
+    function insert_projects(data) {
+        var line = document.createElement("tr");
+        var id = document.createElement("td");
+        var names = document.createElement("td");
+        var del = document.createElement("td");
+        var btn = document.createElement("input");
+        btn.type = "button";
+        btn.onclick = function () {
+            // delete
+            this.parentNode.parentNode.parentNode.removeChild(this.parentNode.parentNode);
+        };
+        btn.value = "删除";
+        id.innerText = data.id;
+        old_projects.push(data.id);
+        names.innerText = data.name;
+        del.appendChild(btn);
+        line.appendChild(id);
+        line.appendChild(names);
+        line.appendChild(del);
+        return line
+    }
+
+    function modify_project() {
+        var table = document.getElementById('projects');
+        var result = [];
+        var del = [];
+        for (var i = 1, rows = table.rows.length; i < rows; i++) {
+            result.push(Number((table.rows[i].cells[0]).innerText));
+        }
+        for (let j = 0; j < old_projects.length; j++) {
+            if (!contains(result, old_projects[j])) {
+                del.push(old_projects[j]);
+            }
+        }
+        if (del.length === 0) {
+            alert("无修改！");
+            return
+        }
+        delete_projects(del);
+    }
+
+    function delete_projects(data) {
+        $.post('delete_projects', {"data": JSON.stringify(data)}, function (ret) {
+            if (Number(ret) === 0) {
+                alert("删除成功！");
+            }
+        })
+    }
+
+    function save_project() {
+        var project = document.getElementById("new_project").value;
+        if (project === "") {
+            alert("内容为空!");
+            return
+        }
+        $.post('insert_project', {"team": team, "data": project}, function (ret) {
+            if (Number(ret) !== -1) {
+                projects.appendChild(insert_projects({"id": Number(ret), "name": project}));
+            }
+        })
     }
 
 </script>

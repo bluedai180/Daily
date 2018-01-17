@@ -7,6 +7,7 @@ app_name = 'report'
 urlpatterns = [
     path('login', views.login, name='login'),
     path('logout', views.logout, name='logout'),
+    path('get_projects', views.get_projects, name='get_projects'),
     path('check_user/', views.check_user, name='check_user'),
     path('edit', views.edit, name='edit'),
     path('get_current_name', views.get_current_name, name='get_current_name'),
@@ -21,5 +22,7 @@ urlpatterns = [
     path('settings', views.settings, name="settings"),
     path('get_team_user', views.get_team_user, name="get_team_user"),
     path('insert_user', views.insert_user, name="insert_user"),
-    path('modify_user', views.modify_user, name="modify_user")
+    path('modify_user', views.modify_user, name="modify_user"),
+    path('delete_projects', views.delete_projects, name='delete_projects'),
+    path('insert_project', views.insert_project, name="insert_project")
 ]
