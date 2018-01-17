@@ -5,6 +5,7 @@ from django.http import HttpResponse, JsonResponse, StreamingHttpResponse
 from django.shortcuts import render
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from report.app.excel import Excel
 from report.app.team import TeamUtils
@@ -184,14 +185,19 @@ def search(request):
     return render(request, 'report/search.html')
 
 
+paginator = None
+
+
 def search_info(request):
+    global paginator
     list_info_result.clear()
-    info = json.loads(request.GET['info'])
+    info = json.loads(request.GET['data'])
     daily = TeamUtils.get_team_daily(info['team'])
     worktype = info['worktype']
     bugid = info['bugid']
     describe = info['describe']
     solution = info['solution']
+    solution_reason = info['solution_reason']
     start_date = info['start_date']
     end_date = info['end_date']
     user = info['user']
@@ -204,17 +210,35 @@ def search_info(request):
         result = result.filter(describe__icontains=describe)
     if solution != "":
         result = result.filter(solution=solution)
+    if solution_reason != "":
+        result = result.filter(solution_reason=solution_reason)
     if start_date != "" and end_date != "":
         result = result.filter(date__range=(start_date, end_date))
     if user != "":
         result = result.filter(email=user)
+
+    paginator = Paginator(result, 3)
+
+    # try:
+    #     print(paginator.num_pages)
+    #     print(paginator.page(1).object_list)
+    # except PageNotAnInteger:
+    #     print(paginator.page(1))
+    # except EmptyPage:
+    #     print(paginator.page(paginator.num_pages))
 
     for x in result.values_list():
         list_info_result.append(list(x)[1:-1])
 
     if result.count() == 0:
         return HttpResponse(0)
-    return JsonResponse(list(result.values()), safe=False)
+    return JsonResponse({"data": list(paginator.page(1).object_list.values()), "pages": paginator.num_pages}, safe=False)
+
+
+def move_page(request):
+    global paginator
+    page = request.GET["page"]
+    return JsonResponse(list(paginator.page(page).object_list.values()), safe=False)
 
 
 def download_search(request):

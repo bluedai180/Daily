@@ -24,5 +24,6 @@ urlpatterns = [
     path('insert_user', views.insert_user, name="insert_user"),
     path('modify_user', views.modify_user, name="modify_user"),
     path('delete_projects', views.delete_projects, name='delete_projects'),
-    path('insert_project', views.insert_project, name="insert_project")
+    path('insert_project', views.insert_project, name="insert_project"),
+    path('move_page', views.move_page, name="move_page")
 ]
