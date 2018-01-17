@@ -217,16 +217,7 @@ def search_info(request):
     if user != "":
         result = result.filter(email=user)
 
-    paginator = Paginator(result, 3)
-
-    # try:
-    #     print(paginator.num_pages)
-    #     print(paginator.page(1).object_list)
-    # except PageNotAnInteger:
-    #     print(paginator.page(1))
-    # except EmptyPage:
-    #     print(paginator.page(paginator.num_pages))
-
+    paginator = Paginator(result, 20)
     for x in result.values_list():
         list_info_result.append(list(x)[1:-1])
 
