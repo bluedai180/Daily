@@ -169,35 +169,39 @@
             y.text = ret[i].name;
             projects.add(y, null);
         }
+        get_current_name();
     });
 
-    $.get('get_current_name', {"user": user}, function (ret) {
-        document.getElementById("person").value = ret["name"];
-        var today = ret['today'];
-        var past = ret['past'];
+    function get_current_name() {
+        $.get('get_current_name', {"user": user}, function (ret) {
+            document.getElementById("person").value = ret["name"];
+            var today = ret['today'];
+            var past = ret['past'];
 
-        if (past != "") {
-            show_last(past);
-        }
-        if (ret["permission"]) {
-            document.getElementById("statistics").style.display = "";
-            document.getElementById("settings").style.display = "";
-        }
-        if (today != "") {
-            submit_btn.value = "提交修改";
-            for (var j = 0; j < today.length; j++) {
-                old.id.push(today[j]['id']);
-                if (j !== 0) {
-                    // 第一行不需要插入
-                    insert();
-                }
-                show_today(document.getElementById('content_' + j.toString()).children, today[j]);
+            if (past != "") {
+                show_last(past);
             }
-            var result = collect_cells(document.getElementById("today"));
-            old.data = result.data;
-            old.content_id = result.content_id;
-        }
-    });
+            if (ret["permission"]) {
+                document.getElementById("statistics").style.display = "";
+                document.getElementById("settings").style.display = "";
+            }
+            if (today != "") {
+                submit_btn.value = "提交修改";
+                for (var j = 0; j < today.length; j++) {
+                    old.id.push(today[j]['id']);
+                    if (j !== 0) {
+                        // 第一行不需要插入
+                        insert();
+                    }
+                    show_today(document.getElementById('content_' + j.toString()).children, today[j]);
+                }
+                var result = collect_cells(document.getElementById("today"));
+                old.data = result.data;
+                old.content_id = result.content_id;
+            }
+        });
+    }
+
 
     function getNowFormatDate() {
         var date = new Date();
@@ -215,15 +219,41 @@
     }
 
     function show_today(ch, today) {
-        ch[0].childNodes[1].value = today['project'];
-        ch[1].childNodes[1].value = today['work_type'];
+        for (var i = 0; i < ch[0].childNodes[1].children.length; i++) {
+            if (ch[0].childNodes[1].children[i].innerText === today['project']) {
+                ch[0].childNodes[1].children[i].selected = true;
+            }
+        }
+
+        for (var j = 0; j < ch[1].childNodes[1].children.length; j++) {
+            if (ch[1].childNodes[1].children[j].innerText === today['work_type']) {
+                ch[1].childNodes[1].children[j].selected = true;
+            }
+        }
+
         ch[2].childNodes[1].value = today['bugid'];
         ch[3].childNodes[1].value = today['describe'];
-        ch[4].childNodes[1].value = today['priority'];
-        ch[5].childNodes[1].value = today['reopen'];
+        for (let i = 0; i < ch[4].childNodes[1].children.length; i++) {
+            if (ch[4].childNodes[1].children[i].innerText === today['priority']) {
+                ch[4].childNodes[1].children[i].selected = true;
+            }
+        }
+        for (let i = 0; i < ch[5].childNodes[1].children.length; i++) {
+            if (ch[5].childNodes[1].children[i].innerText === today['reopen']) {
+                ch[5].childNodes[1].children[i].selected = true;
+            }
+        }
         ch[6].childNodes[1].value = today['reopen_reason'];
-        ch[7].childNodes[1].value = today['solution'];
-        ch[8].childNodes[1].value = today['solution_reason'];
+        for (let i = 0; i < ch[7].childNodes[1].children.length; i++) {
+            if (ch[7].childNodes[1].children[i].innerText === today['solution']) {
+                ch[7].childNodes[1].children[i].selected = true;
+            }
+        }
+        for (let i = 0; i < ch[8].childNodes[1].children.length; i++) {
+            if (ch[8].childNodes[1].children[i].innerText === today['solution_reason']) {
+                ch[8].childNodes[1].children[i].selected = true;
+            }
+        }
         ch[9].childNodes[1].value = today['person'];
         ch[10].childNodes[1].value = today['date'];
         ch[11].childNodes[1].value = today['remake'];

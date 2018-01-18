@@ -193,6 +193,7 @@ def search_info(request):
     list_info_result.clear()
     info = json.loads(request.GET['data'])
     daily = TeamUtils.get_team_daily(info['team'])
+    project = info['project']
     worktype = info['worktype']
     bugid = info['bugid']
     describe = info['describe']
@@ -202,6 +203,8 @@ def search_info(request):
     end_date = info['end_date']
     user = info['user']
     result = daily.objects
+    if project != "":
+        result = result.filter(project=project)
     if worktype != "":
         result = result.filter(work_type=worktype)
     if bugid != "":
