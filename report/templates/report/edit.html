@@ -169,35 +169,39 @@
             y.text = ret[i].name;
             projects.add(y, null);
         }
+        get_current_name();
     });
 
-    $.get('get_current_name', {"user": user}, function (ret) {
-        document.getElementById("person").value = ret["name"];
-        var today = ret['today'];
-        var past = ret['past'];
+    function get_current_name() {
+        $.get('get_current_name', {"user": user}, function (ret) {
+            document.getElementById("person").value = ret["name"];
+            var today = ret['today'];
+            var past = ret['past'];
 
-        if (past != "") {
-            show_last(past);
-        }
-        if (ret["permission"]) {
-            document.getElementById("statistics").style.display = "";
-            document.getElementById("settings").style.display = "";
-        }
-        if (today != "") {
-            submit_btn.value = "提交修改";
-            for (var j = 0; j < today.length; j++) {
-                old.id.push(today[j]['id']);
-                if (j !== 0) {
-                    // 第一行不需要插入
-                    insert();
-                }
-                show_today(document.getElementById('content_' + j.toString()).children, today[j]);
+            if (past != "") {
+                show_last(past);
             }
-            var result = collect_cells(document.getElementById("today"));
-            old.data = result.data;
-            old.content_id = result.content_id;
-        }
-    });
+            if (ret["permission"]) {
+                document.getElementById("statistics").style.display = "";
+                document.getElementById("settings").style.display = "";
+            }
+            if (today != "") {
+                submit_btn.value = "提交修改";
+                for (var j = 0; j < today.length; j++) {
+                    old.id.push(today[j]['id']);
+                    if (j !== 0) {
+                        // 第一行不需要插入
+                        insert();
+                    }
+                    show_today(document.getElementById('content_' + j.toString()).children, today[j]);
+                }
+                var result = collect_cells(document.getElementById("today"));
+                old.data = result.data;
+                old.content_id = result.content_id;
+            }
+        });
+    }
+
 
     function getNowFormatDate() {
         var date = new Date();
@@ -215,6 +219,12 @@
     }
 
     function show_today(ch, today) {
+        {#        console.log(ch[0].childNodes[1].children[1].innerText);#}
+        {#        for (var i = 0; i < ch[0].childNodes[1].children; i++) {#}
+        {#            if (ch[0].childNodes[1].children[i].innerText === today['project']) {#}
+        {#                ch[0].childNodes[1].children[i].selected = true;#}
+        {#            }#}
+        {#        }#}
         ch[0].childNodes[1].value = today['project'];
         ch[1].childNodes[1].value = today['work_type'];
         ch[2].childNodes[1].value = today['bugid'];
