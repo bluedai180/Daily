@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:form="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bootstrap Login Form Template</title>
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="http://cdn.bootcss.com/blueimp-md5/1.1.0/js/md5.js"></script>
+    <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <style>
+        body {
+            margin-left: auto;
+            margin-right: auto;
+            margin-TOP: 300PX;
+        }
+
+        /*web background*/
+        .container {
+            display: table;
+            height: 100%;
+        }
+
+        .row {
+            display: table-cell;
+            vertical-align: middle;
+            width: 80%;
+        }
+
+        /* centered columns styles */
+        .row-centered {
+            text-align: center;
+        }
+
+        .col-centered {
+            display: inline-block;
+            float: none;
+            text-align: left;
+            margin-right: -4px;
+        }
+    </style>
+</head>
+<body>
+<!-- Top content -->
+<div class="container">
+    <div class="row row-centered">
+        <div class="well col-md-6 col-centered">
+            <h2>欢迎登录</h2>
+            <form:form action="/login" method="post" role="form">
+                <div class="input-group input-group-md">
+                    <span class="input-group-addon" id="sizing-addon1"><i class="glyphicon glyphicon-user"
+                                                                          aria-hidden="true"></i></span>
+                    <input type="text" class="form-control" id="userid" name="userid" placeholder="请输入用户ID"/>
+                </div>
+                <div class="input-group input-group-md">
+                        <span class="input-group-addon" id="sizing-addon1"><i
+                                class="glyphicon glyphicon-lock"></i></span>
+                    <input type="password" class="form-control" id="password" name="password" placeholder="请输入密码"/>
+                </div>
+                <br/>
+                <button type="submit" class="btn btn-success btn-block">登录</button>
+            </form:form>
+        </div>
+    </div>
+</div>
+
+
+</div>
+</body>
+</html>
