@@ -143,6 +143,8 @@ Bug ID: <input id="search_bugid" type="text"><br>
                 last_page_btn.disabled = true;
                 if (total_pages === 1) {
                     next_page_btn.disabled = true;
+                } else {
+                    next_page_btn.disabled = false;
                 }
                 pages_lable.innerText = "第" + current_page + "页，共" + total_pages + "页"
                 show_result(ret.data);
