@@ -98,6 +98,8 @@ Bug ID: <input id="search_bugid" type="text"><br>
 
 
     function search() {
+        total_pages = 0;
+        current_page = 1;
         var work_type = document.getElementById("work_type").value;
         var search_bugid = document.getElementById("search_bugid").value;
         var search_describe = document.getElementById("search_describe").value;
