@@ -8,6 +8,9 @@
 </head>
 <body>
 <h1>搜索</h1>
+项目名：<select id="project">
+    <option></option>
+</select><br>
 工作类型: <select id="work_type">
     <option></option>
     <option>解决bug</option>
@@ -87,6 +90,15 @@ Bug ID: <input id="search_bugid" type="text"><br>
     var current_page = 1;
     var table_length = 20;
 
+    $.get('get_projects', {"team": team}, function (ret) {
+        var projects = document.getElementById("project");
+        for (let i = 0; i < ret.length; i++) {
+            var y = document.createElement('option');
+            y.text = ret[i].name;
+            projects.add(y, null);
+        }
+    });
+
     for (let i = 0; i < table_length; i++) {
         var line = document.createElement('tr');
         line.id = "line_" + i.toString();
@@ -100,6 +112,7 @@ Bug ID: <input id="search_bugid" type="text"><br>
     function search() {
         total_pages = 0;
         current_page = 1;
+        var project = document.getElementById("project").value;
         var work_type = document.getElementById("work_type").value;
         var search_bugid = document.getElementById("search_bugid").value;
         var search_describe = document.getElementById("search_describe").value;
@@ -110,6 +123,7 @@ Bug ID: <input id="search_bugid" type="text"><br>
         var user = document.getElementById("user").value;
 
         if ("" === work_type
+                && "" === project
                 && "" === search_bugid
                 && "" === search_describe
                 && "" === solution
@@ -128,6 +142,7 @@ Bug ID: <input id="search_bugid" type="text"><br>
 
         var info = {
             team: team,
+            project: project,
             worktype: work_type,
             bugid: search_bugid,
             describe: search_describe,
