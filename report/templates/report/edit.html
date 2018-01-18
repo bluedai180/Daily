@@ -219,21 +219,41 @@
     }
 
     function show_today(ch, today) {
-        {#        console.log(ch[0].childNodes[1].children[1].innerText);#}
-        {#        for (var i = 0; i < ch[0].childNodes[1].children; i++) {#}
-        {#            if (ch[0].childNodes[1].children[i].innerText === today['project']) {#}
-        {#                ch[0].childNodes[1].children[i].selected = true;#}
-        {#            }#}
-        {#        }#}
-        ch[0].childNodes[1].value = today['project'];
-        ch[1].childNodes[1].value = today['work_type'];
+        for (var i = 0; i < ch[0].childNodes[1].children.length; i++) {
+            if (ch[0].childNodes[1].children[i].innerText === today['project']) {
+                ch[0].childNodes[1].children[i].selected = true;
+            }
+        }
+
+        for (var j = 0; j < ch[1].childNodes[1].children.length; j++) {
+            if (ch[1].childNodes[1].children[j].innerText === today['work_type']) {
+                ch[1].childNodes[1].children[j].selected = true;
+            }
+        }
+
         ch[2].childNodes[1].value = today['bugid'];
         ch[3].childNodes[1].value = today['describe'];
-        ch[4].childNodes[1].value = today['priority'];
-        ch[5].childNodes[1].value = today['reopen'];
+        for (let i = 0; i < ch[4].childNodes[1].children.length; i++) {
+            if (ch[4].childNodes[1].children[i].innerText === today['priority']) {
+                ch[4].childNodes[1].children[i].selected = true;
+            }
+        }
+        for (let i = 0; i < ch[5].childNodes[1].children.length; i++) {
+            if (ch[5].childNodes[1].children[i].innerText === today['reopen']) {
+                ch[5].childNodes[1].children[i].selected = true;
+            }
+        }
         ch[6].childNodes[1].value = today['reopen_reason'];
-        ch[7].childNodes[1].value = today['solution'];
-        ch[8].childNodes[1].value = today['solution_reason'];
+        for (let i = 0; i < ch[7].childNodes[1].children.length; i++) {
+            if (ch[7].childNodes[1].children[i].innerText === today['solution']) {
+                ch[7].childNodes[1].children[i].selected = true;
+            }
+        }
+        for (let i = 0; i < ch[8].childNodes[1].children.length; i++) {
+            if (ch[8].childNodes[1].children[i].innerText === today['solution_reason']) {
+                ch[8].childNodes[1].children[i].selected = true;
+            }
+        }
         ch[9].childNodes[1].value = today['person'];
         ch[10].childNodes[1].value = today['date'];
         ch[11].childNodes[1].value = today['remake'];
