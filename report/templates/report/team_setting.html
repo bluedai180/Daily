@@ -1,11 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Daily</title>
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="http://cdn.bootcss.com/blueimp-md5/1.1.0/js/md5.js"></script>
     <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
 <body>
+
+<nav class="navbar navbar-default" role="navigation" style="background: #00B2EE">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" style="color: aliceblue;font-size: 23px;font-weight: bold">日报统计工具</a>
+        </div>
+        <div>
+            <ul class="nav navbar-nav">
+                <li><a href="edit" style="color: aliceblue;font-size: 18px">编辑日报</a></li>
+                <li id="statistics"><a href="statistics"
+                                                             style="color: aliceblue;font-size: 18px">统计日报</a>
+                </li>
+                <li id="settings" style="background: #009ACD"><a href="settings"
+                                                                               style="color: aliceblue;font-size: 18px">设置</a>
+                </li>
+                <li id="search"><a href="search"
+                                   style="color: aliceblue;font-size: 18px">搜索</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <p id="show_name" class="navbar-text" style="color: aliceblue;font-size: 15px"></p>
+                <li><a href="#" onclick="logout()" style="color: aliceblue;font-size: 18px"><span
+                        class="glyphicon glyphicon-log-out"></span> 登出</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
 <h1>设置</h1>
 <h3>1. 添加新成员</h3>
 姓名 : <input type="text" id="user_name"><br>
@@ -37,7 +69,8 @@
         <th>名称</th>
         <th>操作</th>
     </tr>
-</table><br>
+</table>
+<br>
 <input type="button" onclick="modify_project()" value="确定删除"><br><br>
 
 <script>
@@ -47,8 +80,14 @@
     };
 
     var old_projects = [];
-
-    var team = document.cookie.match(/(^| )team=([^;]*)(;|$)/)[2];
+    try {
+        var user = document.cookie.match(/(^| )user=([^;]*)(;|$)/)[2].replace('"', '').replace('"', '');
+        var team = document.cookie.match(/(^| )team=([^;]*)(;|$)/)[2];
+        document.getElementById("show_name").innerText = user;
+    } catch (e) {
+        alert("请先登录!");
+        window.location.href = 'login';
+    }
     var member = document.getElementById("member");
     var projects = document.getElementById("projects");
 
@@ -262,6 +301,12 @@
                 projects.appendChild(insert_projects({"id": Number(ret), "name": project}));
             }
         })
+    }
+
+    function logout() {
+        document.cookie = "remember=false";
+        $.get('logout');
+        window.location.href = 'login';
     }
 
 </script>

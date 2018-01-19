@@ -1,11 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Daily</title>
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="http://cdn.bootcss.com/blueimp-md5/1.1.0/js/md5.js"></script>
     <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
 <body>
+
+<nav class="navbar navbar-default" role="navigation" style="background: #00B2EE">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" style="color: aliceblue;font-size: 23px;font-weight: bold">日报统计工具</a>
+        </div>
+        <div>
+            <ul class="nav navbar-nav">
+                <li><a href="edit" style="color: aliceblue;font-size: 18px">编辑日报</a></li>
+                <li id="statistics" style="background: #009ACD"><a href="statistics"
+                                                                   style="color: aliceblue;font-size: 18px">统计日报</a>
+                </li>
+                <li id="settings"><a href="settings"
+                                     style="color: aliceblue;font-size: 18px">设置</a></li>
+                <li id="search"><a href="search"
+                                   style="color: aliceblue;font-size: 18px">搜索</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <p id="show_name" class="navbar-text" style="color: aliceblue;font-size: 15px"></p>
+                <li><a href="#" onclick="logout()" style="color: aliceblue;font-size: 18px"><span
+                        class="glyphicon glyphicon-log-out"></span> 登出</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
 <h1>统计日报</h1>
 <h3>以下人员未发日报：</h3>
 <p id="unbilled_user"></p>
@@ -38,7 +69,16 @@
 
 {#<script src="../../static/report/collect.js"></script>#}
 <script>
-    var team = document.cookie.match(/(^| )team=([^;]*)(;|$)/)[2];
+
+    try {
+        var user = document.cookie.match(/(^| )user=([^;]*)(;|$)/)[2].replace('"', '').replace('"', '');
+        var team = document.cookie.match(/(^| )team=([^;]*)(;|$)/)[2];
+        document.getElementById("show_name").innerText = user;
+    } catch (e) {
+        alert("请先登录!");
+        window.location.href = 'login';
+    }
+
     console.log(team);
     {#var team = document.cookie.split(";")[2].split("=")[1];#}
     $.get('collect', {"team": team}, function (ret) {
@@ -101,6 +141,12 @@
 
     function download() {
         window.location.href = "download"
+    }
+
+    function logout() {
+        document.cookie = "remember=false";
+        $.get('logout');
+        window.location.href = 'login';
     }
 
 </script>

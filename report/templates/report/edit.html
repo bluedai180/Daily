@@ -1,15 +1,39 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/html">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Daily</title>
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="http://cdn.bootcss.com/blueimp-md5/1.1.0/js/md5.js"></script>
     <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
 <body>
-<input type="button" id="statistics" onclick="statistics()" value="统计日报" style="display: none">
-<input type="button" id="settings" onclick="setting()" value="设置" style="display: none">
-<input type="button" id="search" onclick="search()" value="搜索">
-<input type="button" id="logout" onclick="logout()" value="登出账号">
+
+<nav class="navbar navbar-default" role="navigation" style="background: #00B2EE">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" style="color: aliceblue;font-size: 23px;font-weight: bold">日报统计工具</a>
+        </div>
+        <div>
+            <ul class="nav navbar-nav">
+                <li style="background: #009ACD"><a href="edit" style="color: aliceblue;font-size: 18px">编辑日报</a></li>
+                <li id="statistics" style="display: none"><a href="statistics" style="color: aliceblue;font-size: 18px">统计日报</a>
+                </li>
+                <li id="settings" style="display: none"><a href="settings"
+                                                           style="color: aliceblue;font-size: 18px">设置</a></li>
+                <li id="search"><a href="search" style="color: aliceblue;font-size: 18px">搜索</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <p id="show_name" class="navbar-text" style="color: aliceblue;font-size: 15px"></p>
+                <li><a href="#" onclick="logout()" style="color: aliceblue;font-size: 18px"><span class="glyphicon glyphicon-log-out"></span> 登出</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
 <h4>前三天：</h4>
 <style type="text/css">
     .AutoNewline {
@@ -152,6 +176,7 @@
     try {
         var user = document.cookie.match(/(^| )user=([^;]*)(;|$)/)[2].replace('"', '').replace('"', '');
         var team = document.cookie.match(/(^| )team=([^;]*)(;|$)/)[2].replace('"', '').replace('"', '');
+        document.getElementById("show_name").innerText = user;
     } catch (e) {
         alert("请先登录!");
         window.location.href = 'login';
