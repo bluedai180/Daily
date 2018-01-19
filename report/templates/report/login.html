@@ -1,19 +1,79 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:form="http://www.w3.org/1999/xhtml">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Daily</title>
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="http://cdn.bootcss.com/blueimp-md5/1.1.0/js/md5.js"></script>
     <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <style>
+        body {
+            margin-left: auto;
+            margin-right: auto;
+            margin-TOP: 300PX;
+            background: url("../../static/report/bg.png") repeat-x;
+        }
+
+        /*web background*/
+        .container {
+            display: table;
+            height: 100%;
+        }
+
+        .row {
+            display: table-cell;
+            vertical-align: middle;
+            width: 80%;
+        }
+
+        /* centered columns styles */
+        .row-centered {
+            text-align: center;
+        }
+
+        .col-centered {
+            display: inline-block;
+            float: none;
+            text-align: left;
+            margin-right: -4px;
+        }
+    </style>
 </head>
 <body>
-<div id="login" style="visibility: hidden">
-    <p>日报统计工具</p>
-    邮箱: <input type="text" id="username" name="username"><br>
-    密码: <input type="password" id="input-password"><br>
-    <input type="hidden" id="md5-password" name="password">
-    <input type="checkbox" id="remember"> 下次自动登录<br>
-    <input type="button" id="user_login" value="登陆" onclick="user_login()">
+
+<div id="login" class="container">
+    <div class="row row-centered">
+        <div class="well col-md-6 col-centered">
+            <h2>日报统计工具</h2>
+            <form:form action="/login" method="post" role="form">
+                <div class="input-group input-group-md">
+                    <span class="input-group-addon" id="sizing-addon1">
+                        <i class="glyphicon glyphicon-user" aria-hidden="true"></i>
+                    </span>
+                    <input type="text" class="form-control" id="username" name="username" placeholder="请输入Email"/>
+                </div>
+                <div class="input-group input-group-md">
+                        <span class="input-group-addon" id="sizing-addon1">
+                            <i class="glyphicon glyphicon-lock"></i>
+                        </span>
+                    <input type="password" class="form-control" id="input-password" name="input-password"
+                           placeholder="请输入密码"/>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" id="remember">下次自动登录
+                    </label>
+                </div>
+                <br/>
+                <button type="submit" class="btn btn-success btn-block" id="user_login" onclick="user_login()">登录
+                </button>
+            </form:form>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -27,8 +87,6 @@
     function user_login() {
         var input_name = document.getElementById('username');
         var input_pwd = document.getElementById('input-password');
-        var md5_pwd = document.getElementById('md5-password');
-        md5_pwd.value = md5(input_pwd.value);
         document.cookie = "remember=" + document.getElementById('remember').checked.toString();
 
         $.get("check_user/", {"id": input_name.value, "pwd": input_pwd.value}, function (ret) {
