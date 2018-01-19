@@ -23,11 +23,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '42eldo!j94%y6ur+)q$zdo2@5t+58-p$*t6g@myzt8w3nd3&s1'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['10.10.152.66', "hipaddaily.com"]
-
-STATIC_ROOT = os.path.join(BASE_DIR, 'collectedstatic')
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -78,12 +76,8 @@ WSGI_APPLICATION = 'Daily.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',  # 或者使用 mysql.connector.django
-        'NAME': 'daily',
-        'USER': 'root',
-        'PASSWORD': '12345',
-        'HOST':'localhost',
-        'PORT':'3306',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
 
