@@ -55,6 +55,7 @@
                         <i class="glyphicon glyphicon-user" aria-hidden="true"></i>
                     </span>
                     <input type="text" class="form-control" id="username" name="username" placeholder="请输入Email"/>
+                    <span class="input-group-addon" id="basic-addon2">@hipad.com</span>
                 </div>
                 <div class="input-group input-group-md">
                         <span class="input-group-addon" id="sizing-addon1">
@@ -89,7 +90,7 @@
         var input_pwd = document.getElementById('input-password');
         document.cookie = "remember=" + document.getElementById('remember').checked.toString();
 
-        $.get("check_user/", {"id": input_name.value, "pwd": input_pwd.value}, function (ret) {
+        $.get("check_user/", {"id": input_name.value + "@hipad.com", "pwd": input_pwd.value}, function (ret) {
             if (ret == 0) {
                 window.location.href = "edit";
             } else {

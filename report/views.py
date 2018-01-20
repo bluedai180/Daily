@@ -102,9 +102,9 @@ def send_daily(request):
                 user_team.reopen_reason = x[6]
                 user_team.solution = x[7]
                 user_team.solution_reason = x[8]
-                user_team.person = x[9]
-                user_team.date = datetime.datetime.strptime(x[10], "%Y-%m-%d")
-                user_team.remake = x[11]
+                user_team.person = user.name
+                user_team.date = datetime.datetime.now().strftime("%Y-%m-%d")
+                user_team.remake = x[9]
                 user_team.email = user.email
                 user_team.save()
 
@@ -124,7 +124,7 @@ def send_daily(request):
                     reopen_reason=data['modify']['data'][i][6],
                     solution=data['modify']['data'][i][7],
                     solution_reason=data['modify']['data'][i][8],
-                    remake=data['modify']['data'][i][11]
+                    remake=data['modify']['data'][i][9]
                 )
 
     except User.DoesNotExist:
