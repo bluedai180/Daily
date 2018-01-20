@@ -186,6 +186,7 @@
 
 {#<script src="../../static/report/edit.js"></script>#}
 <script>
+    "use strict";
     // 禁止后退到登录界面，退出登录只能通过“登出用户”按钮
     history.pushState(null, null, document.URL);
     window.addEventListener('popstate', function () {

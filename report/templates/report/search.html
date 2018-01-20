@@ -111,7 +111,7 @@ Bug ID: <input id="search_bugid" type="text"><br>
 <p id="none_result" style="display: none">查询无结果!</p>
 {#<script src="../../static/report/search.js"></script>#}
 <script>
-
+    "use strict";
     try {
         var user = document.cookie.match(/(^| )user=([^;]*)(;|$)/)[2].replace('"', '').replace('"', '');
         var team = document.cookie.match(/(^| )team=([^;]*)(;|$)/)[2];

@@ -78,6 +78,7 @@
 </div>
 
 <script>
+    "use strict";
     var remember = document.cookie.match(/(^| )remember=([^;]*)(;|$)/);
     if (remember !== null && remember[2].replace('"', '').replace('"', '') === "true") {
         window.location.href = 'edit';
