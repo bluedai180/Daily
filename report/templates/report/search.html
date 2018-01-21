@@ -12,6 +12,29 @@
     <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
 <body>
+<style type="text/css">
+    .AutoNewline {
+        Word-break: break-all;
+    }
+</style>
+<style>
+    table {
+
+    }
+
+    th {
+        height: 30px;
+        font-size: 16px;
+        background-color: #D9EDF7;
+        padding: 3px;
+    }
+
+    td {
+        height: 60px;
+        font-size: 18px;
+        padding: 3px;
+    }
+</style>
 
 <nav class="navbar navbar-default" role="navigation" style="background: #0593D3">
     <div class="container-fluid">
@@ -37,78 +60,145 @@
     </div>
 </nav>
 
+<div style="padding: 20px">
 
-<h1>搜索</h1>
-项目名：<select id="project">
-    <option></option>
-</select><br>
-工作类型: <select id="work_type">
-    <option></option>
-    <option>解决bug</option>
-    <option>非bug库问题处理</option>
-    <option>基线升级</option>
-    <option>需求分析实现</option>
-    <option>团队建设</option>
-    <option>项目支持</option>
-    <option>SPM工作</option>
-    <option>请假</option>
-</select><br>
-Bug ID: <input id="search_bugid" type="text"><br>
-简要描述: <input id="search_describe" type="text"><br>
-解决方案: <select id="solution">
-    <option></option>
-    <option>入库</option>
-    <option>转其他组</option>
-    <option>非问题</option>
-    <option>是问题不修改</option>
-    <option>重复</option>
-    <option>不复现关闭</option>
-    <option>输出文档</option>
-</select><br>
-原因: <select id="solution_reason">
-    <option></option>
-    <option>原始问题</option>
-    <option>转其他组</option>
-    <option>修改引入</option>
-    <option>新需求</option>
-    <option>需求遗留问题</option>
-    <option>非问题</option>
-</select><br>
-起始日期: <input id="start_date" type="date"><br>
-结束日期: <input id="end_date" type="date"><br>
-责任人: <input id="user" type="email">(空白默认全组成员)<br><br>
-<input id="search" type="button" value="查询" onclick="search()">
-<style type="text/css">
-    .AutoNewline {
-        Word-break: break-all;
-    }
-</style>
-<div id="result_div" style="display: none">
-    <h3>搜索结果：</h3>
-    <table class="AutoNewline" id="result" border="1" cellpadding="5" cellspacing="0">
-        <tr>
-            <th>项目</th>
-            <th>工作类型</th>
-            <th>Bug ID</th>
-            <th>简要描述</th>
-            <th>优先级</th>
-            <th>是否reopen</th>
-            <th>reopen原因</th>
-            <th>解决方案</th>
-            <th>原因</th>
-            <th>责任人</th>
-            <th>日期</th>
-            <th>备注</th>
-        </tr>
-    </table>
+    <div class="panel panel-info" style="width: 25%">
+        <div class="panel-heading">
+            <h3 class="panel-title">搜索条件：</h3>
+        </div>
+        <div class="panel-body">
+
+            <form:form role="form">
+                <div class="input-group input-group-md">
+                    <span class="input-group-addon" style="width: 100px;text-align: left">
+                        <i>项目名：</i>
+                    </span>
+                    <select class="form-control" id="project" style="width: 320px">
+                        <option></option>
+                    </select>
+                </div>
+                <div class="input-group input-group-md">
+                    <span class="input-group-addon" id="sizing-addon1" style="width: 100px;text-align: left">
+                        <i>工作类型：</i>
+                    </span>
+                    <select class="form-control" id="work_type" style="width: 320px">
+                        <option></option>
+                        <option>解决bug</option>
+                        <option>非bug库问题处理</option>
+                        <option>基线升级</option>
+                        <option>需求分析实现</option>
+                        <option>团队建设</option>
+                        <option>项目支持</option>
+                        <option>SPM工作</option>
+                        <option>请假</option>
+                    </select>
+                </div>
+                <div class="input-group input-group-md">
+                        <span class="input-group-addon" style="width: 100px;text-align: left">
+                            <i>Bug ID：</i>
+                        </span>
+                    <input class="form-control" id="search_bugid" style="width: 320px"/>
+                </div>
+                <div class="input-group input-group-md">
+                        <span class="input-group-addon" style="width: 100px;text-align: left">
+                            <i>简要描述：</i>
+                        </span>
+                    <input class="form-control" id="search_describe" style="width: 320px"/>
+                </div>
+                <div class="input-group input-group-md">
+                    <span class="input-group-addon" style="width: 100px;text-align: left">
+                        <i>解决方案：</i>
+                    </span>
+                    <select class="form-control" id="solution" style="width: 320px">
+                        <option></option>
+                        <option>入库</option>
+                        <option>转其他组</option>
+                        <option>非问题</option>
+                        <option>是问题不修改</option>
+                        <option>重复</option>
+                        <option>不复现关闭</option>
+                        <option>输出文档</option>
+                    </select>
+                </div>
+
+                <div class="input-group input-group-md">
+                    <span class="input-group-addon" style="width: 100px;text-align: left">
+                        <i>原因：</i>
+                    </span>
+                    <select class="form-control" id="solution_reason" style="width: 320px">
+                        <option></option>
+                        <option>原始问题</option>
+                        <option>转其他组</option>
+                        <option>修改引入</option>
+                        <option>新需求</option>
+                        <option>需求遗留问题</option>
+                        <option>非问题</option>
+                    </select>
+                </div>
+
+                <div class="input-group input-group-md">
+                        <span class="input-group-addon" style="width: 100px;text-align: left">
+                            <i>起始日期：</i>
+                        </span>
+                    <input class="form-control" id="start_date" type="date" style="width: 320px;text-align: right"/>
+                </div>
+
+                <div class="input-group input-group-md">
+                        <span class="input-group-addon" style="width: 100px;text-align: left">
+                            <i>结束日期：</i>
+                        </span>
+                    <input class="form-control" id="end_date" type="date" style="width: 320px;text-align: right"/>
+                </div>
+                <div class="input-group input-group-md">
+                        <span class="input-group-addon" style="width: 100px;text-align: left">
+                            <i>责任人：</i>
+                        </span>
+                    <input class="form-control" id="user"/>
+                    <span class="input-group-addon" id="basic-addon2">@hipad.com</span>
+                </div>
+                <br>
+
+                <button type="submit" class="btn btn-success btn-block" id="search" onclick="search()">查询
+                </button>
+                <button type="button" class="btn btn-default btn-block" id="download" onclick="download()">结果导出Excel文件
+                </button>
+            </form:form>
+        </div>
+    </div>
     <br>
-    <input type="button" onclick="last_page()" value="上一页" id="last_page">
-    <a id="pages_lable"></a>
-    <input type="button" onclick="next_page()" value="下一页" id="next_page"><br><br>
-    <input onclick="download()" value="导出Excel文件" type="button"><br>
+
+    <div id="result_div" style="display: none">
+        <h3>搜索结果：</h3>
+        <table class="AutoNewline" id="result" border="1" cellpadding="5" cellspacing="0">
+            <tr>
+                <th style="width: 140px;text-align: center">项目</th>
+                <th style="width: 130px;text-align: center">工作类型</th>
+                <th style="width: 100px;text-align: center">Bug ID</th>
+                <th style="width: 400px;text-align: center">简要描述</th>
+                <th style="width: 60px;text-align: center">优先级</th>
+                <th style="width: 100px;text-align: center">是否reopen</th>
+                <th style="width: 200px;text-align: center">reopen原因</th>
+                <th style="width: 130px;text-align: center">解决方案</th>
+                <th style="width: 100px;text-align: center">原因</th>
+                <th style="width: 70px;text-align: center">责任人</th>
+                <th style="width: 100px;text-align: center">日期</th>
+                <th style="width: 350px;text-align: center">备注</th>
+            </tr>
+        </table>
+        <br>
+
+        <nav aria-label="Page navigation">
+            <ul class="pager">
+                <li onclick="last_page()" id="last_page"><a>上一页</a></li>
+                <li id="pages_lable"></li>
+                <li onclick="next_page()" id="next_page"><a>下一页</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <p id="none_result" style="display: none">查询无结果!</p>
 </div>
 
-<p id="none_result" style="display: none">查询无结果!</p>
 {#<script src="../../static/report/search.js"></script>#}
 <script>
     "use strict";
@@ -120,6 +210,8 @@ Bug ID: <input id="search_bugid" type="text"><br>
         alert("请先登录!");
         window.location.href = 'login';
     }
+
+    document.getElementById("download").disabled = "disabled";
 
     $.get('get_current_name', {"user": user}, function (ret) {
         if (ret["permission"]) {
@@ -202,19 +294,21 @@ Bug ID: <input id="search_bugid" type="text"><br>
         $.get('search_info', {"data": JSON.stringify(info)}, function (ret) {
             if (ret != 0) {
                 total_pages = ret.pages;
-                last_page_btn.disabled = true;
+                last_page_btn.className = "disabled";
                 if (total_pages === 1) {
-                    next_page_btn.disabled = true;
+                    next_page_btn.className = 'disabled';
                 } else {
-                    next_page_btn.disabled = false;
+                    next_page_btn.removeClass('disabled');
                 }
                 pages_lable.innerText = "第" + current_page + "页，共" + total_pages + "页"
                 show_result(ret.data);
                 document.getElementById("result_div").style.display = "";
                 document.getElementById("none_result").style.display = "none";
+                document.getElementById("download").disabled = "";
             } else {
                 document.getElementById("none_result").style.display = "";
                 document.getElementById("result_div").style.display = "none";
+                document.getElementById("download").disabled = "disabled";
             }
         })
     }
@@ -256,10 +350,10 @@ Bug ID: <input id="search_bugid" type="text"><br>
     function last_page() {
         current_page -= 1;
         if (current_page < total_pages) {
-            next_page_btn.disabled = false;
+            next_page_btn.removeClass('disabled');
         }
         if (current_page === 1) {
-            last_page_btn.disabled = true;
+            last_page_btn.className = 'disabled';
         }
         pages_lable.innerText = "第" + current_page + "页，共" + total_pages + "页"
         get_current_page();
@@ -268,10 +362,10 @@ Bug ID: <input id="search_bugid" type="text"><br>
     function next_page() {
         current_page += 1;
         if (current_page > 1) {
-            last_page_btn.disabled = false;
+            last_page_btn.removeClass('disabled');
         }
         if (current_page === total_pages) {
-            next_page_btn.disabled = true;
+            next_page_btn.className = 'disabled';
         }
         pages_lable.innerText = "第" + current_page + "页，共" + total_pages + "页"
         get_current_page();

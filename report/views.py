@@ -218,7 +218,7 @@ def search_info(request):
     if start_date != "" and end_date != "":
         result = result.filter(date__range=(start_date, end_date))
     if user != "":
-        result = result.filter(email=user)
+        result = result.filter(email=user+"@hipad.com")
 
     paginator = Paginator(result, 20)
     for x in result.values_list():
