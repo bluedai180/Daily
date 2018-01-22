@@ -39,14 +39,14 @@
         <div>
             <ul class="nav navbar-nav">
                 <li><a href="edit" style="color: aliceblue;font-size: 18px">编辑日报</a></li>
+                <li id="search"><a href="search"
+                                   style="color: aliceblue;font-size: 18px">搜索</a></li>
                 <li id="statistics"><a href="statistics"
                                        style="color: aliceblue;font-size: 18px">统计日报</a>
                 </li>
                 <li id="settings" style="background: #0482BA"><a href="settings"
                                                                  style="color: aliceblue;font-size: 18px">设置</a>
                 </li>
-                <li id="search"><a href="search"
-                                   style="color: aliceblue;font-size: 18px">搜索</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 <p id="show_name" class="navbar-text" style="color: aliceblue;font-size: 15px"></p>
@@ -69,19 +69,20 @@
                 <span class="input-group-addon" style="width: 100px;text-align: left">
                     <i>姓名 : </i>
                 </span>
-                <input class="form-control" id="user_name" style="width: 320px"/>
+                <input class="form-control" id="user_name" style="width: 330px"/>
             </div>
             <div class="input-group input-group-md">
                 <span class="input-group-addon" style="width: 100px;text-align: left">
                     <i>密码 : </i>
                 </span>
-                <input class="form-control" id="pwd" style="width: 320px"/>
+                <input class="form-control" id="pwd" style="width: 330px"/>
             </div>
             <div class="input-group input-group-md">
                 <span class="input-group-addon" style="width: 100px;text-align: left">
                     <i>邮箱 : </i>
                 </span>
-                <input class="form-control" id="email" style="width: 320px"/>
+                <input class="form-control" id="email" style="width: 230px"/>
+                <span class="input-group-addon" id="basic-addon2">@hipad.com</span>
             </div>
             <div class="input-group input-group-md">
                 <span class="input-group-addon" style="width: 100px;text-align: left">
@@ -177,6 +178,7 @@
     }
 
     function insert_table_user(table, data) {
+        console.log(data);
         var line = document.createElement("tr");
         var id = document.createElement("td");
         var names = document.createElement("td");
@@ -259,7 +261,7 @@
         var user = {
             "name": username,
             "pwd": pwd,
-            "email": email,
+            "email": email + "@hipad.com",
             "permission": permission,
             "team": team
         };
