@@ -44,8 +44,8 @@ def check_user(request):
         return HttpResponse(-1)
     if user.pwd == pwd:
         response = HttpResponse(0)
-        response.set_cookie('user', id)
-        response.set_cookie('team', user.team.name)
+        response.set_cookie('user', id, max_age=60 * 60 * 24 * 30)
+        response.set_cookie('team', user.team.name, max_age=60 * 60 * 24 * 30)
         return response
     else:
         return HttpResponse(-2)
@@ -218,7 +218,7 @@ def search_info(request):
     if start_date != "" and end_date != "":
         result = result.filter(date__range=(start_date, end_date))
     if user != "":
-        result = result.filter(email=user+"@hipad.com")
+        result = result.filter(email=user + "@hipad.com")
 
     paginator = Paginator(result, 20)
     for x in result.values_list():
@@ -226,7 +226,8 @@ def search_info(request):
 
     if result.count() == 0:
         return HttpResponse(0)
-    return JsonResponse({"data": list(paginator.page(1).object_list.values()), "pages": paginator.num_pages}, safe=False)
+    return JsonResponse({"data": list(paginator.page(1).object_list.values()), "pages": paginator.num_pages},
+                        safe=False)
 
 
 def move_page(request):
