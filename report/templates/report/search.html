@@ -298,7 +298,7 @@
                 if (total_pages === 1) {
                     next_page_btn.className = 'disabled';
                 } else {
-                    next_page_btn.removeClass('disabled');
+                    next_page_btn.className = 'enabled';
                 }
                 pages_lable.innerText = "第" + current_page + "页，共" + total_pages + "页"
                 show_result(ret.data);
@@ -350,7 +350,7 @@
     function last_page() {
         current_page -= 1;
         if (current_page < total_pages) {
-            next_page_btn.removeClass('disabled');
+            next_page_btn.className = 'enabled';
         }
         if (current_page === 1) {
             last_page_btn.className = 'disabled';
@@ -362,7 +362,7 @@
     function next_page() {
         current_page += 1;
         if (current_page > 1) {
-            last_page_btn.removeClass('disabled');
+            last_page_btn.className = 'enabled';
         }
         if (current_page === total_pages) {
             next_page_btn.className = 'disabled';
