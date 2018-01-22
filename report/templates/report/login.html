@@ -80,19 +80,23 @@
 
 <script>
     "use strict";
-    var remember = document.cookie.match(/(^| )remember=([^;]*)(;|$)/);
-    if (remember !== null && remember[2].replace('"', '').replace('"', '') === "true") {
+    try {
+        document.cookie.match(/(^| )user=([^;]*)(;|$)/)[2].replace('"', '').replace('"', '');
         window.location.href = 'edit';
-    } else {
+    } catch (e) {
         document.getElementById("login").style.visibility = "visible";
     }
 
     function user_login() {
         var input_name = document.getElementById('username');
         var input_pwd = document.getElementById('input-password');
-        document.cookie = "remember=" + document.getElementById('remember').checked.toString();
+        var remember = document.getElementById('remember').checked;
 
-        $.get("check_user/", {"id": input_name.value + "@hipad.com", "pwd": input_pwd.value}, function (ret) {
+        $.get("check_user/", {
+            "id": input_name.value + "@hipad.com",
+            "pwd": input_pwd.value,
+            "remember": remember
+        }, function (ret) {
             if (ret == 0) {
                 window.location.href = "edit";
             } else {

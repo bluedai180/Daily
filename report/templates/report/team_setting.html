@@ -379,7 +379,6 @@
     }
 
     function logout() {
-        document.cookie = "remember=false";
         $.get('logout');
         window.location.href = 'login';
     }

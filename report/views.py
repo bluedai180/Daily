@@ -22,6 +22,7 @@ def login(request):
 def logout(request):
     response = HttpResponse(0)
     response.delete_cookie("user")
+    response.delete_cookie("team")
     return response
 
 
@@ -38,14 +39,19 @@ def get_projects(request):
 def check_user(request):
     id = request.GET['id']
     pwd = request.GET['pwd']
+    is_remember = request.GET['remember']
     try:
         user = User.objects.get(email=id)
     except User.DoesNotExist:
         return HttpResponse(-1)
     if user.pwd == pwd:
         response = HttpResponse(0)
-        response.set_cookie('user', id, max_age=60 * 60 * 24 * 30)
-        response.set_cookie('team', user.team.name, max_age=60 * 60 * 24 * 30)
+        if is_remember == "true":
+            response.set_cookie('user', id, max_age=60 * 60 * 24 * 30)
+            response.set_cookie('team', user.team.name, max_age=60 * 60 * 24 * 30)
+        else:
+            response.set_cookie('user', id)
+            response.set_cookie('team', user.team.name)
         return response
     else:
         return HttpResponse(-2)
