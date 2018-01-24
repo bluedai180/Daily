@@ -154,7 +154,7 @@ def collect(request):
         if today_all.count() == 0:
             return HttpResponse(0)
         current_user = [x['email'] for x in today_all.values('email').distinct()]
-        team_user = [x.email for x in User.objects.filter(team__name='app')]
+        team_user = [x.email for x in User.objects.filter(team__name=team)]
         ret_list = []
         for x in list(set(current_user) ^ set(team_user)):
             ret_list.append(User.objects.get(email=x).name)
