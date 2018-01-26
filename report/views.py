@@ -166,9 +166,13 @@ def collect(request):
     return JsonResponse(info, safe=False)
 
 
+@csrf_exempt
 def download(request):
     excel = Excel()
-    the_file_path = excel.write_to_excel(list_info_today, mark=True)
+    team = request.POST["team"]
+    data = json.loads(request.POST["data"])
+
+    the_file_path = excel.write_to_excel(data, mark=True)
 
     def file_iterator(file_name):
         with open(file_name, 'rb') as f:
@@ -179,7 +183,7 @@ def download(request):
                 else:
                     break
 
-    the_file_name = "daily-%s.xlsx" % timezone.now().date().strftime("%Y-%m-%d")
+    the_file_name = "daily-%s-%s.xlsx" % (team, timezone.now().date().strftime("%Y-%m-%d"))
     response = StreamingHttpResponse(file_iterator(the_file_path))
     response['Content-Type'] = 'application/octet-stream'
     response['Content-Disposition'] = 'attachment;filename="{0}"'.format(the_file_name)
@@ -340,3 +344,26 @@ def insert_project(request):
     except Project.DoesNotExist:
         return HttpResponse(-1)
     return HttpResponse(project.id)
+
+
+def edit_weekly(request):
+    return render(request, 'report/edit_weekly.html')
+
+
+def get_weekly(request):
+    user = request.GET['user']
+    start = request.GET['start']
+    end = request.GET['end']
+    daily = TeamUtils.get_team_daily(request.GET['team'])
+    try:
+        result = daily.objects.filter(date__range=(start, end)).filter(email=user)
+        total = result.values_list("project", "describe")
+        project = []
+        for x in total:
+            project.append(x[0])
+
+        print(result.values_list("project", "describe"))
+
+    except daily.DoesNotExist:
+        return HttpResponse(-1)
+    return JsonResponse(list(result.values("project", "describe", "remake")), safe=False)

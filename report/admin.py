@@ -9,7 +9,7 @@ class UserAdmin(admin.ModelAdmin):
 
 
 class DailyAdmin(admin.ModelAdmin):
-    list_display = ("describe", "person", "date")
+    list_display = ("person", "project", "describe", "date")
 
 
 class ProjectAdmin(admin.ModelAdmin):
