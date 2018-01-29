@@ -20,6 +20,7 @@
         <div>
             <ul class="nav navbar-nav">
                 <li style="background: #0482BA"><a href="edit" style="color: aliceblue;font-size: 20px">编辑日报</a></li>
+{#                <li><a href="edit_weekly" style="color: aliceblue;font-size: 18px">编辑周报</a></li>#}
                 <li id="search"><a href="search" style="color: aliceblue;font-size: 18px">搜索</a></li>
                 <li id="statistics" style="display: none"><a href="statistics" style="color: aliceblue;font-size: 18px">统计日报</a>
                 </li>
@@ -82,6 +83,7 @@
     {#    </table>#}
     {#    <br>#}
     <h4 id="today_title"></h4>
+    <h3 style="color: red;">为了方便周报自动统计，日报的项目名不能空白，如果下拉菜单中没有相应项目名，请联系部长添加！如果工作内容是团队建设请选择项目名为"团队建设"。</h3>
     <table class="AutoNewline" id="today" border="1" cellpadding="3" cellspacing="0">
         <tr>
             <th style="width: 120px;text-align: center">项目</th>
@@ -101,7 +103,6 @@
         <tr id="content_0" style="height: 100px">
             <td>
                 <select id="project">
-                    <option></option>
                 </select>
             </td>
             <td>
