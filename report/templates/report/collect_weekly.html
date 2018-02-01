@@ -83,21 +83,21 @@
             <h4>3. 修改完成后，点击保存即生成本组周报，此时如果组员又新提了周报将无法统计进去，只能点击重新统计</h4>
         </div>
     </div>
-
-    <table class="AutoNewline" id="weekly" border="1" cellpadding="10">
-        <tr>
-            <th style="width: 120px;text-align: center">项目</th>
-            <th style="width: 600px;text-align: center">本周工作内容</th>
-            <th style="width: 100px;text-align: center">工时</th>
-            <th style="width: 350px;text-align: center">下周工作安排</th>
-            <th style="width: 350px;text-align: center">疑难问题</th>
-        </tr>
-    </table>
-    <br>
-    <input class="btn btn-primary" type="button" onclick="save_modify()" value="保存"><br><br>
-    <input class="btn btn-success" type="button" onclick="download_excel()" value="导出Excel文件"><br><br>
-    <input class="btn btn-danger" type="button" onclick="reset_weekly()" value="重新统计"><br><br>
-    <div id="loading" class="loading" style="display:none;">发送中,请稍等...</div>
+    <div id="collect_weekly_div">
+        <table class="AutoNewline" id="weekly" border="1" cellpadding="10">
+            <tr>
+                <th style="width: 120px;text-align: center">项目</th>
+                <th style="width: 600px;text-align: center">本周工作内容</th>
+                <th style="width: 100px;text-align: center">工时</th>
+                <th style="width: 350px;text-align: center">下周工作安排</th>
+                <th style="width: 350px;text-align: center">疑难问题</th>
+            </tr>
+        </table>
+        <br>
+        <input class="btn btn-primary" type="button" onclick="save_modify()" value="保存"><br><br>
+        <input class="btn btn-success" type="button" onclick="download_excel()" value="导出Excel文件"><br><br>
+        <input class="btn btn-danger" type="button" onclick="reset_weekly()" value="重新统计"><br><br>
+    </div>
 </div>
 
 
@@ -116,11 +116,13 @@
 
     var weekly = document.getElementById("weekly");
     var collect_user = document.getElementById("collect_user");
+    var collect_weekly_div = document.getElementById("collect_weekly_div");
     $.get('get_weekly_total', {'team': team}, function (ret) {
         if (Number(ret) === 0) {
             collect_user.style.display = "";
             $.get('collect_weekly', {"team": team}, function (ret) {
                 if (ret != 0) {
+                    collect_weekly_div.style.display = "";
                     for (var i = 0; i < ret['data'].length; i++) {
                         show_weekly(ret['data'][i].project, ret['data'][i].info, ret['data'][i].time, ret['data'][i].next_week, ret['data'][i].difficult);
                     }
@@ -144,6 +146,7 @@
                     weekly.appendChild(line);
                     document.getElementById("unbilled_user").innerText = ret.name.join(", ");
                 } else {
+                    collect_weekly_div.style.display = "none";
                     document.getElementById("unbilled_user").innerText = "目前全部未发周报！";
                 }
             });
