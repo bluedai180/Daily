@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Daily</title>
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="http://cdn.bootcss.com/blueimp-md5/1.1.0/js/md5.js"></script>
+    <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+<style type="text/css">
+    .AutoNewline {
+        Word-break: break-all;
+    }
+</style>
+<style>
+    table {
+
+    }
+
+    th {
+        height: 30px;
+        font-size: 16px;
+        background-color: #D9EDF7;
+        padding: 3px;
+    }
+
+    td {
+        height: 100px;
+        font-size: 18px;
+        padding: 3px;
+    }
+</style>
+
+<nav class="navbar navbar-default" role="navigation" style="background: #0593D3">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" style="color: aliceblue;font-size: 23px;font-weight: bold">日报统计工具</a>
+        </div>
+        <div>
+            <ul class="nav navbar-nav">
+                <li><a href="edit" style="color: aliceblue;font-size: 20px">编辑日报</a></li>
+                <li style="background: #0482BA"><a href="edit_weekly" style="color: aliceblue;font-size: 18px">编辑周报</a>
+                </li>
+                <li id="search"><a href="search" style="color: aliceblue;font-size: 18px">搜索</a></li>
+                <li id="statistics" style="display: none"><a href="statistics" style="color: aliceblue;font-size: 18px">统计日报</a>
+                </li>
+                <li id="statistics_weekly" style="display: none"><a href="statistics_weekly"
+                                                                    style="color: aliceblue;font-size: 18px">统计周报</a>
+                </li>
+                <li id="settings" style="display: none"><a href="settings"
+                                                           style="color: aliceblue;font-size: 18px">设置</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <p id="show_name" class="navbar-text" style="color: aliceblue;font-size: 15px"></p>
+                <li><a href="#" onclick="logout()" style="color: aliceblue;font-size: 18px"><span
+                        class="glyphicon glyphicon-log-out"></span> 登出</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div style="padding: 20px">
+    <div class="panel panel-danger" style="width: 50%">
+        <div class="panel-heading">
+            <h3 class="panel-title">使用说明：</h3>
+        </div>
+        <div class="panel-body">
+            <p id="unbilled_user" style="font-size: 18px"></p>
+            <h4>1. 选择需要汇总周报的日期范围，提取的是日报的简要描述信息，并自动对项目名进行分类汇总</h4>
+            <h4>2. 某项无信息时，保持输入框为空</h4>
+            <h4>3. 如果汇总日期选错，请刷新页面重新汇总</h4>
+        </div>
+    </div>
+    <div id="collect_weekly">
+        <div class="input-group input-group-md">
+            <span class="input-group-addon" style="width: 100px;text-align: left">
+                <i>起始日期：</i>
+            </span>
+            <input class="form-control" id="start_date" type="date" style="width: 320px;text-align: right"/>
+        </div>
+
+        <div class="input-group input-group-md">
+            <span class="input-group-addon" style="width: 100px;text-align: left">
+                <i>结束日期：</i>
+            </span>
+            <input class="form-control" id="end_date" type="date" style="width: 320px;text-align: right"/>
+        </div>
+        <input class="btn btn-default" type="button" onclick="collect()" value="汇总" style="width: 420px;">
+    </div>
+
+    <div id="collect_result" style="display: none">
+        <h3>汇总结果：</h3>
+        <table class="AutoNewline" id="weekly" border="1" cellpadding="10">
+            <tr>
+                <th style="width: 120px;text-align: center">项目</th>
+                <th style="width: 600px;text-align: center">本周工作内容</th>
+                <th style="width: 100px;text-align: center">工时</th>
+                <th style="width: 350px;text-align: center">下周工作安排</th>
+                <th style="width: 350px;text-align: center">疑难问题</th>
+            </tr>
+        </table>
+        <br>
+        <input class="btn btn-primary" type="button" onclick="save_weekly()" value="保存周报"><br>
+    </div>
+</div>
+
+<script>
+    "use strict";
+    try {
+        var user = document.cookie.match(/(^| )user=([^;]*)(;|$)/)[2].replace('"', '').replace('"', '');
+        var team = document.cookie.match(/(^| )team=([^;]*)(;|$)/)[2];
+        document.getElementById("show_name").innerText = user;
+    } catch (e) {
+        alert("请先登录!");
+        window.location.href = 'login';
+    }
+    var weekly = document.getElementById("weekly");
+    var old = {
+        id: [],
+        project: [],
+        info: [],
+        time: [],
+        next: [],
+        difficult: []
+    };
+    var collect_div = document.getElementById("collect_weekly");
+    var collect_result_div = document.getElementById("collect_result");
+
+    $.get('get_permission', {'user': user}, function (ret) {
+        if (ret === "True") {
+            document.getElementById("statistics").style.display = "";
+            document.getElementById("settings").style.display = "";
+            document.getElementById("statistics_weekly").style.display = "";
+        }
+    });
+
+    $.get('get_weekly_saved', {'user': user, 'team': team}, function (ret) {
+        if (Number(ret) === 0) {
+            collect_div.style.display = '';
+        } else {
+            collect_div.style.display = 'none';
+            collect_result_div.style.display = '';
+            for (var i = 0; i < ret.length; i++) {
+                old.id.push(ret[i]["id"]);
+                old.project.push(ret[i]["project"]);
+                old.info.push(ret[i]["info"]);
+                old.time.push(ret[i]["time"]);
+                old.next.push(ret[i]["next_week"]);
+                old.difficult.push(ret[i]["difficult"]);
+                show_weekly(ret[i]["project"], ret[i]["info"], ret[i]["time"], ret[i]["next_week"], ret[i]["difficult"])
+            }
+        }
+    });
+
+
+    function collect() {
+        collect_result_div.style.display = '';
+        var start_date = document.getElementById("start_date").value;
+        var end_date = document.getElementById("end_date").value;
+        if (start_date === "" && end_date === "") {
+            alert("搜索内容不能为空！");
+            return
+        }
+        if (("" === start_date && "" !== end_date) || ("" === end_date && "" !== start_date)) {
+            alert("起始、终止日期要填全！");
+            return
+        }
+
+        $.get("get_weekly", {"user": user, "team": team, "start": start_date, "end": end_date}, function (ret) {
+            for (var i = 0; i < ret['project'].length; i++) {
+                show_weekly(ret['project'][i], ret['info'][i], "", "", "");
+            }
+            var line = document.createElement("tr");
+            var leave = document.createElement('td');
+            leave.innerText = "请假";
+            line.appendChild(leave);
+            var none = document.createElement('td');
+            line.appendChild(none);
+            var leave_time = document.createElement('td');
+            var leave_time_data = document.createElement('textarea');
+            leave_time_data.style.height = "100%";
+            leave_time_data.style.width = "100%";
+            leave_time.appendChild(leave_time_data);
+            var none1 = document.createElement('td');
+            var none2 = document.createElement('td');
+            line.appendChild(leave_time);
+            line.appendChild(none1);
+            line.appendChild(none2);
+            weekly.appendChild(line);
+        })
+    }
+
+    function show_weekly(pro, inf, tim, nex, dif) {
+        var line = document.createElement("tr");
+        var project = document.createElement('td');
+        project.style.height = "400px";
+        var info = document.createElement("td");
+        var project_data = document.createElement('textarea');
+        project_data.value = pro;
+        project_data.style.height = "100%";
+        project_data.style.width = "100%";
+        var info_data = document.createElement('textarea');
+        info_data.value = inf;
+        info_data.style.height = "100%";
+        info_data.style.width = "100%";
+        var time = document.createElement("td");
+        var time_data = document.createElement('textarea');
+        time_data.value = tim;
+        time_data.style.height = "100%";
+        time_data.style.width = "100%";
+        time.appendChild(time_data);
+        var next = document.createElement("td");
+        var next_data = document.createElement('textarea');
+        next_data.value = nex;
+        next_data.style.height = "100%";
+        next_data.style.width = "100%";
+        next.appendChild(next_data);
+        var difficult = document.createElement("td");
+        var difficult_data = document.createElement('textarea');
+        difficult_data.value = dif;
+        difficult_data.style.height = "100%";
+        difficult_data.style.width = "100%";
+        difficult.appendChild(difficult_data);
+        project.appendChild(project_data);
+        info.appendChild(info_data);
+        line.appendChild(project);
+        line.appendChild(info);
+        line.appendChild(time);
+        line.appendChild(next);
+        line.appendChild(difficult);
+        weekly.appendChild(line);
+    }
+
+    function save_weekly() {
+        var result = {
+            project: [],
+            info: [],
+            time: [],
+            next_week: [],
+            difficult: []
+        };
+        for (var i = 1; i < weekly.rows.length; i++) {
+            try {
+                result.project.push(weekly.rows[i].cells[0].firstElementChild.value);
+                result.info.push(weekly.rows[i].cells[1].firstElementChild.value);
+                result.time.push(weekly.rows[i].cells[2].firstElementChild.value);
+                result.next_week.push(weekly.rows[i].cells[3].firstElementChild.value);
+                result.difficult.push(weekly.rows[i].cells[4].firstElementChild.value);
+            } catch (e) {
+                result.project.push(weekly.rows[i].cells[0].innerText);
+                result.info.push(weekly.rows[i].cells[1].innerText);
+                result.time.push(weekly.rows[i].cells[2].innerText);
+                result.next_week.push(weekly.rows[i].cells[3].innerText);
+                result.difficult.push(weekly.rows[i].cells[4].innerText);
+            }
+        }
+        if (old.id.length === 0) {
+            console.log("insert");
+            $.post('save_weekly', {
+                'user': user,
+                "team": team,
+                'action': 'insert',
+                'data': JSON.stringify(result)
+            }, function (ret) {
+                if (Number(ret) === 0) {
+                    alert('保存成功！');
+                    window.location.reload();
+                }
+            })
+        } else {
+            var result_new = {
+                id: [],
+                project: [],
+                info: [],
+                time: [],
+                next: [],
+                difficult: []
+            };
+            for (var j = 0; j < result.project.length; j++) {
+                if (old.info[j] === result.info[j] && old.time[j] === result.time[j] && old.next[j] === result.next_week[j]
+                        && old.difficult[j] === result.difficult[j]) {
+                    console.log(old.info[j] + " same");
+                    {#                    alert("内容无修改！");#}
+                } else {
+                    result_new.id.push(old.id[j]);
+                    result_new.project.push(result.project[j]);
+                    result_new.info.push(result.info[j]);
+                    result_new.time.push(result.time[j]);
+                    result_new.next.push(result.next_week[j]);
+                    result_new.difficult.push(result.difficult[j]);
+                }
+            }
+            console.log(result_new);
+            $.post('save_weekly', {
+                'user': user,
+                'team': team,
+                'action': 'modify',
+                data: JSON.stringify(result_new)
+            }, function (ret) {
+                if (Number(ret) === 0) {
+                    window.location.reload();
+                }
+                console.log(ret);
+            })
+        }
+
+    }
+    function logout() {
+        $.get('logout');
+        window.location.href = 'login';
+    }
+
+</script>
+
+</body>
+</html>

@@ -25,5 +25,15 @@ urlpatterns = [
     path('modify_user', views.modify_user, name="modify_user"),
     path('delete_projects', views.delete_projects, name='delete_projects'),
     path('insert_project', views.insert_project, name="insert_project"),
-    path('move_page', views.move_page, name="move_page")
+    path('move_page', views.move_page, name="move_page"),
+    path('edit_weekly', views.edit_weekly, name="edit_weekly"),
+    path('get_weekly', views.get_weekly, name="get_weekly"),
+    path('save_weekly', views.save_weekly, name="save_weekly"),
+    path('get_weekly_saved', views.get_weekly_saved, name='get_weekly_saved'),
+    path('statistics_weekly', views.statistics_weekly, name='statistics_weekly'),
+    path('collect_weekly', views.collect_weekly, name='collect_weekly'),
+    path('save_weekly_total', views.save_weekly_total, name='save_weekly_total'),
+    path('get_weekly_total', views.get_weekly_total, name='get_weekly_total'),
+    path('download_weekly', views.download_weekly, name='download_weekly'),
+    path('get_permission', views.get_permission, name='get_permission')
 ]

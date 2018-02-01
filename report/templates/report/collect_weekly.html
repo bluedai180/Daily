@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Daily</title>
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="http://cdn.bootcss.com/blueimp-md5/1.1.0/js/md5.js"></script>
+    <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+<style type="text/css">
+    .AutoNewline {
+        Word-break: break-all;
+    }
+</style>
+<style>
+    table {
+
+    }
+
+    th {
+        height: 30px;
+        font-size: 16px;
+        background-color: #D9EDF7;
+        padding: 3px;
+    }
+
+    td {
+        height: 100px;
+        font-size: 18px;
+        padding: 3px;
+    }
+</style>
+
+<nav class="navbar navbar-default" role="navigation" style="background: #0593D3">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" style="color: aliceblue;font-size: 23px;font-weight: bold">日报统计工具</a>
+        </div>
+        <div>
+            <ul class="nav navbar-nav">
+                <li><a href="edit" style="color: aliceblue;font-size: 18px">编辑日报</a></li>
+                <li><a href="edit_weekly" style="color: aliceblue;font-size: 18px">编辑周报</a></li>
+                <li id="search"><a href="search"
+                                   style="color: aliceblue;font-size: 18px">搜索</a></li>
+                <li id="statistics"><a href="statistics"
+                                       style="color: aliceblue;font-size: 18px">统计日报</a>
+                </li>
+                <li id="statistics_weekly"><a href="statistics_weekly"
+                                              style="background: #0482BA;color: aliceblue;font-size: 18px">统计周报</a></li>
+                <li id="settings"><a href="settings"
+                                     style="color: aliceblue;font-size: 18px">设置</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <p id="show_name" class="navbar-text" style="color: aliceblue;font-size: 15px"></p>
+                <li><a href="#" onclick="logout()" style="color: aliceblue;font-size: 18px"><span
+                        class="glyphicon glyphicon-log-out"></span> 登出</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div style="padding: 20px">
+    <div id="collect_user" class="panel panel-danger" style="width: 50%">
+        <div class="panel-heading">
+            <h3 class="panel-title">以下人员未发周报：</h3>
+        </div>
+        <div class="panel-body">
+            <p id="unbilled_user" style="font-size: 18px"></p>
+        </div>
+    </div>
+    <div class="panel panel-danger" style="width: 50%">
+        <div class="panel-heading">
+            <h3 class="panel-title">使用说明：</h3>
+        </div>
+        <div class="panel-body">
+            <p id="unbilled_user" style="font-size: 18px"></p>
+            <h4>1. 在修改前确保组内人员已经全部提交周报</h4>
+            <h4>2. 某项无信息时，保持输入框为空</h4>
+            <h4>3. 修改完成后，点击保存即生成本组周报，此时如果组员又新提了周报将无法统计进去，只能点击重新统计</h4>
+        </div>
+    </div>
+
+    <table class="AutoNewline" id="weekly" border="1" cellpadding="10">
+        <tr>
+            <th style="width: 120px;text-align: center">项目</th>
+            <th style="width: 600px;text-align: center">本周工作内容</th>
+            <th style="width: 100px;text-align: center">工时</th>
+            <th style="width: 350px;text-align: center">下周工作安排</th>
+            <th style="width: 350px;text-align: center">疑难问题</th>
+        </tr>
+    </table>
+    <br>
+    <input class="btn btn-primary" type="button" onclick="save_modify()" value="保存"><br><br>
+    <input class="btn btn-success" type="button" onclick="download_excel()" value="导出Excel文件"><br><br>
+    <input class="btn btn-danger" type="button" onclick="reset_weekly()" value="重新统计"><br><br>
+    <div id="loading" class="loading" style="display:none;">发送中,请稍等...</div>
+</div>
+
+
+<script>
+    "use strict";
+    try {
+        var user = document.cookie.match(/(^| )user=([^;]*)(;|$)/)[2].replace('"', '').replace('"', '');
+        var team = document.cookie.match(/(^| )team=([^;]*)(;|$)/)[2];
+        document.getElementById("show_name").innerText = user;
+    } catch (e) {
+        alert("请先登录!");
+        window.location.href = 'login';
+    }
+
+    var old = [];
+
+    var weekly = document.getElementById("weekly");
+    var collect_user = document.getElementById("collect_user");
+    $.get('get_weekly_total', {'team': team}, function (ret) {
+        if (Number(ret) === 0) {
+            collect_user.style.display = "";
+            $.get('collect_weekly', {"team": team}, function (ret) {
+                if (ret != 0) {
+                    for (var i = 0; i < ret['data'].length; i++) {
+                        show_weekly(ret['data'][i].project, ret['data'][i].info, ret['data'][i].time, ret['data'][i].next_week, ret['data'][i].difficult);
+                    }
+
+                    var line = document.createElement("tr");
+                    var leave = document.createElement('td');
+                    leave.innerText = "离职人员";
+                    line.appendChild(leave);
+                    var none = document.createElement('td');
+                    var leave_time = document.createElement('td');
+                    var leave_time_data = document.createElement('textarea');
+                    leave_time_data.style.height = "100%";
+                    leave_time_data.style.width = "100%";
+                    leave_time.appendChild(leave_time_data);
+                    var none1 = document.createElement('td');
+                    var none2 = document.createElement('td');
+                    line.appendChild(leave_time);
+                    line.appendChild(none);
+                    line.appendChild(none1);
+                    line.appendChild(none2);
+                    weekly.appendChild(line);
+                    document.getElementById("unbilled_user").innerText = ret.name.join(", ");
+                } else {
+                    document.getElementById("unbilled_user").innerText = "目前全部未发周报！";
+                }
+            });
+        } else {
+            collect_user.style.display = "none";
+            for (var i = 0; i < ret.length; i++) {
+                var old_info = {
+                    id: "",
+                    project: "",
+                    info: "",
+                    time: 0,
+                    next_week: "",
+                    difficult: ""
+                };
+                old_info.id = ret[i].id;
+                old_info.project = ret[i].project;
+                old_info.info = ret[i].info;
+                old_info.time = ret[i].time;
+                old_info.next_week = ret[i].next_week;
+                old_info.difficult = ret[i].difficult;
+                old.push(old_info);
+                show_weekly(ret[i].project, ret[i].info, ret[i].time, ret[i].next_week, ret[i].difficult);
+            }
+        }
+    });
+
+
+    function show_weekly(pro, inf, tim, nex, dif) {
+        var line = document.createElement("tr");
+        var project = document.createElement('td');
+        project.style.height = "400px";
+        var info = document.createElement("td");
+        var project_data = document.createElement('textarea');
+        project_data.value = pro;
+        project_data.style.height = "100%";
+        project_data.style.width = "100%";
+        var info_data = document.createElement('textarea');
+        info_data.value = inf;
+        info_data.style.height = "100%";
+        info_data.style.width = "100%";
+        var time = document.createElement("td");
+        var time_data = document.createElement('textarea');
+        if (tim !== "") {
+            time_data.value = Number(tim).toFixed(1);
+        }
+
+        time_data.style.height = "100%";
+        time_data.style.width = "100%";
+        time.appendChild(time_data);
+        var next = document.createElement("td");
+        var next_data = document.createElement('textarea');
+        next_data.value = nex;
+        next_data.style.height = "100%";
+        next_data.style.width = "100%";
+        next.appendChild(next_data);
+        var difficult = document.createElement("td");
+        var difficult_data = document.createElement('textarea');
+        difficult_data.value = dif;
+        difficult_data.style.height = "100%";
+        difficult_data.style.width = "100%";
+        difficult.appendChild(difficult_data);
+        project.appendChild(project_data);
+        info.appendChild(info_data);
+        line.appendChild(project);
+        line.appendChild(info);
+        line.appendChild(time);
+        line.appendChild(next);
+        line.appendChild(difficult);
+        weekly.appendChild(line);
+    }
+
+    function save_modify() {
+        var result_total = collect_cells();
+
+        if (old.length === 0) {
+            $.post('save_weekly_total', {
+                'user': user,
+                'team': team,
+                'data': JSON.stringify(result_total),
+                'action': 'insert'
+            }, function (ret) {
+                if (Number(ret) === 0) {
+                    alert("保存成功");
+                    window.location.reload();
+                }
+            });
+        } else {
+            var result_new_total = [];
+            for (var j = 0; j < result_total.length; j++) {
+                if (result_total[j].project === old[j].project
+                        && result_total[j].info === old[j].info
+                        && result_total[j].time === old[j].time
+                        && result_total[j].next_week === old[j].next_week
+                        && result_total[j].difficult === old[j].difficult) {
+                } else {
+                    var result_new = {
+                        id: "",
+                        project: "",
+                        info: "",
+                        time: 0,
+                        next_week: "",
+                        difficult: ""
+                    };
+                    result_new.id = old[j].id;
+                    result_new.project = result_total[j].project;
+                    result_new.info = result_total[j].info;
+                    result_new.time = result_total[j].time;
+                    result_new.next_week = result_total[j].next_week;
+                    result_new.difficult = result_total[j].difficult;
+                    result_new_total.push(result_new);
+                }
+            }
+            $.post('save_weekly_total', {
+                'user': user,
+                'team': team,
+                'data': JSON.stringify(result_new_total),
+                'action': 'modify'
+            }, function (ret) {
+                if (Number(ret) === 0) {
+                    alert("保存成功");
+                    window.location.reload();
+                }
+            });
+        }
+    }
+
+    function collect_cells() {
+        var total = [];
+        for (var i = 1; i < weekly.rows.length; i++) {
+            var result = {
+                project: "",
+                info: "",
+                time: 0,
+                next_week: "",
+                difficult: ""
+            };
+
+            try {
+                result.project = weekly.rows[i].cells[0].firstElementChild.value;
+                result.info = weekly.rows[i].cells[1].firstElementChild.value;
+                result.time = weekly.rows[i].cells[2].firstElementChild.value;
+                result.next_week = weekly.rows[i].cells[3].firstElementChild.value;
+                result.difficult = weekly.rows[i].cells[4].firstElementChild.value;
+            } catch (e) {
+                result.project = weekly.rows[i].cells[0].innerText;
+                result.info = weekly.rows[i].cells[1].innerText;
+                result.time = weekly.rows[i].cells[2].innerText;
+                result.next_week = weekly.rows[i].cells[3].innerText;
+                result.difficult = weekly.rows[i].cells[4].innerText;
+            }
+            total.push(result);
+        }
+        return total;
+    }
+
+    function download_excel() {
+        var result_total = collect_cells();
+        var result = [];
+        for (var i = 0; i < result_total.length; i++) {
+            var temp = [];
+            temp.push(result_total[i].project);
+            temp.push(result_total[i].info);
+            temp.push(result_total[i].time);
+            temp.push(result_total[i].next_week);
+            temp.push(result_total[i].difficult);
+            result.push(temp)
+        }
+        console.log(result);
+
+        var url = 'download_weekly';
+        var formData = new FormData();
+        formData.append('team', team);
+        formData.append('data', JSON.stringify(result));
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', url, true);    // 也可以使用POST方式，根据接口
+        xhr.responseType = "blob";  // 返回类型blob
+        // 定义请求完成的处理函数，请求前也可以增加加载框/禁用下载按钮逻辑
+        xhr.onload = function () {
+            // 请求完成
+            if (this.status === 200) {
+                // 返回200
+                var blob = this.response;
+                var reader = new FileReader();
+                reader.readAsDataURL(blob);  // 转换为base64，可以直接放入a表情href
+                reader.onload = function (e) {
+                    // 转换完成，创建一个a标签用于下载
+                    var a = document.createElement('a');
+                    a.download = team + "-weekly-" + getNowFormatDate() + ".xlsx";
+                    a.href = e.target.result;
+                    $("body").append(a);  // 修复firefox中无法触发click
+                    a.click();
+                    $(a).remove();
+                }
+            }
+        };
+        // 发送ajax请求
+        xhr.send(formData);
+    }
+
+    function getNowFormatDate() {
+        var date = new Date();
+        var seperator1 = "/";
+        var year = date.getFullYear();
+        var month = date.getMonth() + 1;
+        var strDate = date.getDate();
+        if (month >= 1 && month <= 9) {
+            month = "0" + month;
+        }
+        if (strDate >= 0 && strDate <= 9) {
+            strDate = "0" + strDate;
+        }
+        return year + seperator1 + month + seperator1 + strDate;
+    }
+
+    function reset_weekly() {
+        $.post('save_weekly_total', {
+            'user': user,
+            'team': team,
+            'data': "",
+            'action': 'reset'
+        }, function (ret) {
+            if (Number(ret) === 0) {
+                alert("重置成功");
+                window.location.reload();
+            }
+        });
+    }
+    function logout() {
+        $.get('logout');
+        window.location.href = 'login';
+    }
+
+
+</script>
+</body>
+</html>

@@ -43,13 +43,15 @@
         </div>
         <div>
             <ul class="nav navbar-nav">
-                <li><a href="edit" style="color: aliceblue;font-size: 18px">编辑日报</a></li>
-                <li style="background: #0482BA" id="search"><a href="search"
-                                                               style="color: aliceblue;font-size: 18px">搜索</a></li>
-                <li id="statistics" style="display:none"><a href="statistics" style="color: aliceblue;font-size: 18px">统计日报</a>
+                <li><a href="edit" style="color: aliceblue;font-size: 20px">编辑日报</a></li>
+                <li><a href="edit_weekly" style="color: aliceblue;font-size: 18px">编辑周报</a></li>
+                <li id="search" style="background: #0482BA"><a href="search" style="color: aliceblue;font-size: 18px">搜索</a></li>
+                <li id="statistics" style="display: none"><a href="statistics" style="color: aliceblue;font-size: 18px">统计日报</a>
                 </li>
-                <li id="settings" style="display:none"><a href="settings"
-                                                          style="color: aliceblue;font-size: 18px">设置</a></li>
+                <li id="statistics_weekly" style="display: none"><a href="statistics_weekly"
+                                              style="color: aliceblue;font-size: 18px">统计周报</a></li>
+                <li id="settings" style="display: none"><a href="settings"
+                                                           style="color: aliceblue;font-size: 18px">设置</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 <p id="show_name" class="navbar-text" style="color: aliceblue;font-size: 15px"></p>
@@ -217,6 +219,7 @@
         if (ret["permission"]) {
             document.getElementById("statistics").style.display = "";
             document.getElementById("settings").style.display = "";
+            document.getElementById("statistics_weekly").style.display = "";
         }
     });
 

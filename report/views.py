@@ -6,6 +6,7 @@ from django.shortcuts import render
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from datetime import timedelta
 
 from report.app.excel import Excel
 from report.app.team import TeamUtils
@@ -350,6 +351,28 @@ def edit_weekly(request):
     return render(request, 'report/edit_weekly.html')
 
 
+def get_permission(request):
+    try:
+        user = User.objects.get(email=request.GET['user'])
+    except User.DoesNotExist:
+        return HttpResponse(-1)
+    return HttpResponse(user.permission)
+
+
+def get_weekly_saved(request):
+    user = request.GET['user']
+    team = request.GET['team']
+    try:
+        weekly = TeamUtils.get_team_weekly(team)
+        result = weekly.objects.filter(date__week=datetime.datetime.now().isocalendar()[1]).filter(email=user).filter(
+            total=False)
+        if result.exists() is False:
+            return HttpResponse(0)
+    except weekly.DoesNotExist:
+        return HttpResponse(-1)
+    return JsonResponse(list(result.values()), safe=False)
+
+
 def get_weekly(request):
     user = request.GET['user']
     start = request.GET['start']
@@ -358,12 +381,146 @@ def get_weekly(request):
     try:
         result = daily.objects.filter(date__range=(start, end)).filter(email=user)
         total = result.values_list("project", "describe")
-        project = []
-        for x in total:
-            project.append(x[0])
+        project = list(set([x[0] for x in total]))
+        info = [[] for _ in range(len(project))]
 
-        print(result.values_list("project", "describe"))
+        for x in total:
+            if x[0] in project:
+                if len(info[project.index(x[0])]) == 0:
+                    info[project.index(x[0])] = x[1]
+                else:
+                    info[project.index(x[0])] = str(info[project.index(x[0])]) + "\n" + x[1]
 
     except daily.DoesNotExist:
         return HttpResponse(-1)
-    return JsonResponse(list(result.values("project", "describe", "remake")), safe=False)
+    return JsonResponse({"project": project, "info": info}, safe=False)
+
+
+@csrf_exempt
+def save_weekly(request):
+    user = request.POST['user']
+    team = request.POST['team']
+    data = json.loads(request.POST['data'])
+    action = request.POST['action']
+    weekly = TeamUtils.get_team_weekly(team)
+    if action == "insert":
+        try:
+            for i in range(len(data['project'])):
+                weekly_info = weekly()
+                weekly_info.project = data['project'][i]
+                weekly_info.info = data['info'][i]
+                weekly_info.time = data['time'][i]
+                weekly_info.next_week = data['next_week'][i]
+                weekly_info.difficult = data['difficult'][i]
+                weekly_info.date = datetime.datetime.now().strftime("%Y-%m-%d")
+                weekly_info.email = user
+                weekly_info.save()
+        except weekly.DoesNotExist:
+            return HttpResponse(-1)
+    else:
+        try:
+            for i in range(len(data['id'])):
+                weekly.objects.filter(id=data['id'][i]).update(
+                    project=data['project'][i],
+                    info=data['info'][i],
+                    time=data['time'][i],
+                    next_week=data['next'][i],
+                    difficult=data['difficult'][i]
+                )
+        except weekly.DoesNotExist:
+            return HttpResponse(-1)
+    return HttpResponse(0)
+
+
+def statistics_weekly(request):
+    return render(request, 'report/collect_weekly.html')
+
+
+def collect_weekly(request):
+    team = request.GET['team']
+    try:
+        weekly = TeamUtils.get_team_weekly(team)
+        today_all = weekly.objects.filter(date__week=datetime.datetime.now().isocalendar()[1]).filter(total=False)
+        if today_all.exists() is False:
+            return HttpResponse(0)
+        current_user = [x['email'] for x in today_all.values('email').distinct()]
+        team_user = [x.email for x in User.objects.filter(team__name=team)]
+        ret_list = []
+        for x in list(set(current_user) ^ set(team_user)):
+            ret_list.append(User.objects.get(email=x).name)
+
+        total = today_all.values_list("project", "info", "time", "next_week", "difficult")
+        project = list(set([x[0] for x in total]))
+        result = [{"project": x, "info": "", "time": 0.0, "next_week": "", "difficult": ""} for x in project]
+
+        for x in total:
+            for y in result:
+                if x[0] == y['project']:
+                    if x[1] is not None: y['info'] += x[1]
+                    if x[2] != "": y['time'] += float(x[2])
+                    if x[3] is not None: y['next_week'] += x[3]
+                    if x[4] is not None: y['difficult'] += x[4]
+
+    except weekly.DoesNotExist:
+        return HttpResponse(-1)
+    return JsonResponse({'data': result,
+                         'name': ret_list}, safe=False)
+
+
+@csrf_exempt
+def save_weekly_total(request):
+    user = request.POST['user']
+    team = request.POST['team']
+    if request.POST['data'] != "":
+        data = json.loads(request.POST['data'])
+    action = request.POST['action']
+    weekly = TeamUtils.get_team_weekly(team)
+    try:
+        if action == "insert":
+            for x in data:
+                weekly_new = weekly()
+                weekly_new.project = x['project']
+                weekly_new.info = x['info']
+                weekly_new.time = x['time']
+                weekly_new.next_week = x['next_week']
+                weekly_new.difficult = x['difficult']
+                weekly_new.email = user
+                weekly_new.date = datetime.datetime.now().strftime("%Y-%m-%d")
+                weekly_new.total = True
+                weekly_new.save()
+        elif action == 'modify':
+            for y in data:
+                weekly.objects.filter(id=y['id']).update(
+                    project=y['project'],
+                    info=y['info'],
+                    time=y['time'],
+                    next_week=y['next_week'],
+                    difficult=y['difficult']
+                )
+        elif action == 'reset':
+            weekly.objects.filter(date__week=datetime.datetime.now().isocalendar()[1]).filter(total=True).delete()
+    except weekly.DoesNotExist:
+        return HttpResponse(-1)
+
+    return HttpResponse(0)
+
+
+def get_weekly_total(request):
+    team = request.GET['team']
+    weekly = TeamUtils.get_team_weekly(team)
+
+    try:
+        result = weekly.objects.filter(date__week=datetime.datetime.now().isocalendar()[1]).filter(total=True)
+        if result.exists() is False:
+            return HttpResponse(0)
+    except weekly.DoesNotExist:
+        return HttpResponse(-1)
+    return JsonResponse(list(result.values()), safe=False)
+
+
+@csrf_exempt
+def download_weekly(request):
+    excel = Excel()
+    team = request.POST["team"]
+    data = json.loads(request.POST["data"])
+    return excel.write_weekly_to_excel(data, team)

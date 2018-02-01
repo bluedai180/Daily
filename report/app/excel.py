@@ -1,5 +1,8 @@
+from django.http import StreamingHttpResponse
 from openpyxl import Workbook
+from openpyxl.descriptors import Alias
 from openpyxl.styles import Border, Side, Font, Alignment, NamedStyle, colors
+from django.utils import timezone
 import time
 
 from openpyxl.styles import PatternFill
@@ -10,7 +13,6 @@ class Excel:
     def __init__(self):
         self.wb_new = Workbook()
         self.ws_new = self.wb_new.active
-        self.ws_new.title = "日报"
         self.yellow_lines = []
 
     def write_to_excel(self, data, mark=False):
@@ -30,7 +32,68 @@ class Excel:
         self.wb_new.save(file_name)
         return file_name
 
+    def write_weekly_to_excel(self, data, team):
+        """写入周报数据，导出excel表格"""
+        self.ws_new.append(['项目', '本周工作内容', '工时', '下周工作安排', '疑难问题'])
+        for x in data:
+            self.ws_new.append(x)
+        file_name = "report/temp/" + str(time.time()) + ".xlsx"
+        self.ws_new.column_dimensions['A'].width = 20
+        self.ws_new.column_dimensions['B'].width = 70
+        self.ws_new.column_dimensions['C'].width = 14
+        self.ws_new.column_dimensions['D'].width = 70
+        self.ws_new.column_dimensions['E'].width = 70
+        left, right, top, bottom = [Side(style='thin', color='000000')] * 4
+        title = NamedStyle(name="title")
+        title.font = Font(name=u'宋体', size=11, bold=True)
+        title.alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
+        title.border = Border(left=left, right=right, top=top, bottom=bottom)
+        title.fill = PatternFill(fill_type='solid', fgColor="FF0593D3")
+        content = NamedStyle(name="content")
+        content.font = Font(name=u'宋体', size=11, bold=True)
+        content.number_format = FORMAT_DATE_YYYYMMDD2
+        content.alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
+        content.border = Border(left=left, right=right, top=top, bottom=bottom)
+        content_long = NamedStyle(name="content_long")
+        content_long.font = Font(name=u'宋体', size=11)
+        content_long.border = Border(left=left, right=right, top=top, bottom=bottom)
+        content_long.alignment = Alignment(horizontal='left', vertical='top', wrap_text=True)
+        content_long.shrink_to_fit = Alias('shrinkToFit')
+        for x in self.ws_new['A']:
+            x.style = content
+        for x in self.ws_new['B']:
+            x.style = content_long
+        for x in self.ws_new['C']:
+            x.style = content
+        for x in self.ws_new['D']:
+            x.style = content_long
+        for x in self.ws_new['E']:
+            x.style = content_long
+        for x in self.ws_new[1]:
+            x.style = title
+
+        self.ws_new.row_dimensions[1].height = 20
+        for i in range(self.ws_new.max_row):
+            self.ws_new.row_dimensions[i + 2].height = 150
+        self.wb_new.save(file_name)
+
+        def file_iterator(file_name):
+            with open(file_name, 'rb') as f:
+                while True:
+                    c = f.read()
+                    if c:
+                        yield c
+                    else:
+                        break
+
+        the_file_name = "weekly-%s-%s.xlsx" % (team, timezone.now().date().strftime("%Y-%m-%d"))
+        response = StreamingHttpResponse(file_iterator(file_name))
+        response['Content-Type'] = 'application/octet-stream'
+        response['Content-Disposition'] = 'attachment;filename="{0}"'.format(the_file_name)
+        return response
+
     def format_file(self):
+        """将日报excel文件配置样式"""
         self.ws_new.column_dimensions['A'].width = 20
         self.ws_new.column_dimensions['B'].width = 14
         self.ws_new.column_dimensions['C'].width = 14
@@ -87,6 +150,7 @@ class Excel:
             x.style = content_long
 
     def mark_lines(self):
+        """有入库信息的行标黄"""
         for i in self.yellow_lines:
             for x in self.ws_new[i + 2]:
                 x.fill = PatternFill(fill_type='solid', fgColor=colors.YELLOW)
