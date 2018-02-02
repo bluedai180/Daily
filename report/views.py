@@ -456,10 +456,10 @@ def collect_weekly(request):
         for x in total:
             for y in result:
                 if x[0] == y['project']:
-                    if x[1] is not None: y['info'] += ("\n" + x[1])
+                    if x[1] is not None: y['info'] += (x[1] + "\n")
                     if x[2] != "": y['time'] += float(x[2])
-                    if x[3] is not None: y['next_week'] += ("\n" + x[3])
-                    if x[4] is not None: y['difficult'] += ("\n" + x[4])
+                    if x[3] is not None: y['next_week'] += (x[3] + "\n")
+                    if x[4] is not None: y['difficult'] += (x[4] + "\n")
 
     except weekly.DoesNotExist:
         return HttpResponse(-1)
