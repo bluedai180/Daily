@@ -35,5 +35,6 @@ urlpatterns = [
     path('save_weekly_total', views.save_weekly_total, name='save_weekly_total'),
     path('get_weekly_total', views.get_weekly_total, name='get_weekly_total'),
     path('download_weekly', views.download_weekly, name='download_weekly'),
-    path('get_permission', views.get_permission, name='get_permission')
+    path('get_permission', views.get_permission, name='get_permission'),
+    path('search_weekly', views.search_weekly, name='search_weekly')
 ]

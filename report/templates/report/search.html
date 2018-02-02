@@ -45,11 +45,13 @@
             <ul class="nav navbar-nav">
                 <li><a href="edit" style="color: aliceblue;font-size: 20px">编辑日报</a></li>
                 <li><a href="edit_weekly" style="color: aliceblue;font-size: 18px">编辑周报</a></li>
-                <li id="search" style="background: #0482BA"><a href="search" style="color: aliceblue;font-size: 18px">搜索</a></li>
+                <li id="search" style="background: #0482BA"><a href="search"
+                                                               style="color: aliceblue;font-size: 18px">搜索</a></li>
                 <li id="statistics" style="display: none"><a href="statistics" style="color: aliceblue;font-size: 18px">统计日报</a>
                 </li>
                 <li id="statistics_weekly" style="display: none"><a href="statistics_weekly"
-                                              style="color: aliceblue;font-size: 18px">统计周报</a></li>
+                                                                    style="color: aliceblue;font-size: 18px">统计周报</a>
+                </li>
                 <li id="settings" style="display: none"><a href="settings"
                                                            style="color: aliceblue;font-size: 18px">设置</a></li>
             </ul>
@@ -64,107 +66,161 @@
 
 <div style="padding: 20px">
 
-    <div class="panel panel-info" style="width: 25%">
-        <div class="panel-heading">
-            <h3 class="panel-title">搜索条件：</h3>
-        </div>
-        <div class="panel-body">
+    <div style="display:table-cell">
+        <div class="panel panel-info" style="width: 100%">
+            <div class="panel-heading">
+                <h3 class="panel-title">搜索日报：</h3>
+            </div>
+            <div class="panel-body">
 
-            <form:form role="form">
-                <div class="input-group input-group-md">
+                <form:form role="form">
+                    <div class="input-group input-group-md">
                     <span class="input-group-addon" style="width: 100px;text-align: left">
                         <i>项目名：</i>
                     </span>
-                    <select class="form-control" id="project" style="width: 320px">
-                        <option></option>
-                    </select>
-                </div>
-                <div class="input-group input-group-md">
+                        <select class="form-control" id="project" style="width: 320px">
+                            <option></option>
+                        </select>
+                    </div>
+                    <div class="input-group input-group-md">
                     <span class="input-group-addon" id="sizing-addon1" style="width: 100px;text-align: left">
                         <i>工作类型：</i>
                     </span>
-                    <select class="form-control" id="work_type" style="width: 320px">
-                        <option></option>
-                        <option>解决bug</option>
-                        <option>非bug库问题处理</option>
-                        <option>基线升级</option>
-                        <option>需求分析实现</option>
-                        <option>团队建设</option>
-                        <option>项目支持</option>
-                        <option>SPM工作</option>
-                        <option>请假</option>
-                    </select>
-                </div>
-                <div class="input-group input-group-md">
+                        <select class="form-control" id="work_type" style="width: 320px">
+                            <option></option>
+                            <option>解决bug</option>
+                            <option>非bug库问题处理</option>
+                            <option>基线升级</option>
+                            <option>需求分析实现</option>
+                            <option>团队建设</option>
+                            <option>项目支持</option>
+                            <option>SPM工作</option>
+                            <option>请假</option>
+                        </select>
+                    </div>
+                    <div class="input-group input-group-md">
                         <span class="input-group-addon" style="width: 100px;text-align: left">
                             <i>Bug ID：</i>
                         </span>
-                    <input class="form-control" id="search_bugid" style="width: 320px"/>
-                </div>
-                <div class="input-group input-group-md">
+                        <input class="form-control" id="search_bugid" style="width: 320px"/>
+                    </div>
+                    <div class="input-group input-group-md">
                         <span class="input-group-addon" style="width: 100px;text-align: left">
                             <i>简要描述：</i>
                         </span>
-                    <input class="form-control" id="search_describe" style="width: 320px"/>
-                </div>
-                <div class="input-group input-group-md">
+                        <input class="form-control" id="search_describe" style="width: 320px"/>
+                    </div>
+                    <div class="input-group input-group-md">
                     <span class="input-group-addon" style="width: 100px;text-align: left">
                         <i>解决方案：</i>
                     </span>
-                    <select class="form-control" id="solution" style="width: 320px">
-                        <option></option>
-                        <option>入库</option>
-                        <option>转其他组</option>
-                        <option>非问题</option>
-                        <option>是问题不修改</option>
-                        <option>重复</option>
-                        <option>不复现关闭</option>
-                        <option>输出文档</option>
-                    </select>
-                </div>
+                        <select class="form-control" id="solution" style="width: 320px">
+                            <option></option>
+                            <option>入库</option>
+                            <option>转其他组</option>
+                            <option>非问题</option>
+                            <option>是问题不修改</option>
+                            <option>重复</option>
+                            <option>不复现关闭</option>
+                            <option>输出文档</option>
+                        </select>
+                    </div>
 
-                <div class="input-group input-group-md">
+                    <div class="input-group input-group-md">
                     <span class="input-group-addon" style="width: 100px;text-align: left">
                         <i>原因：</i>
                     </span>
-                    <select class="form-control" id="solution_reason" style="width: 320px">
-                        <option></option>
-                        <option>原始问题</option>
-                        <option>转其他组</option>
-                        <option>修改引入</option>
-                        <option>新需求</option>
-                        <option>需求遗留问题</option>
-                        <option>非问题</option>
-                    </select>
-                </div>
+                        <select class="form-control" id="solution_reason" style="width: 320px">
+                            <option></option>
+                            <option>原始问题</option>
+                            <option>转其他组</option>
+                            <option>修改引入</option>
+                            <option>新需求</option>
+                            <option>需求遗留问题</option>
+                            <option>非问题</option>
+                        </select>
+                    </div>
 
-                <div class="input-group input-group-md">
+                    <div class="input-group input-group-md">
                         <span class="input-group-addon" style="width: 100px;text-align: left">
                             <i>起始日期：</i>
                         </span>
-                    <input class="form-control" id="start_date" type="date" style="width: 320px;text-align: right"/>
-                </div>
+                        <input class="form-control" id="start_date" type="date" style="width: 320px;text-align: right"/>
+                    </div>
 
-                <div class="input-group input-group-md">
+                    <div class="input-group input-group-md">
                         <span class="input-group-addon" style="width: 100px;text-align: left">
                             <i>结束日期：</i>
                         </span>
-                    <input class="form-control" id="end_date" type="date" style="width: 320px;text-align: right"/>
-                </div>
-                <div class="input-group input-group-md">
+                        <input class="form-control" id="end_date" type="date" style="width: 320px;text-align: right"/>
+                    </div>
+                    <div class="input-group input-group-md">
                         <span class="input-group-addon" style="width: 100px;text-align: left">
                             <i>责任人：</i>
                         </span>
-                    <input class="form-control" id="user"/>
-                    <span class="input-group-addon" id="basic-addon2">@hipad.com</span>
+                        <input class="form-control" style="width: 215px" id="user"/>
+                        <span class="input-group-addon" style="width: 100px;">@hipad.com</span>
+                    </div>
+                    <br>
+
+                    <button type="submit" class="btn btn-success btn-block" id="search" onclick="search()">查询
+                    </button>
+                    <button type="button" class="btn btn-default btn-block" id="download" onclick="download()">
+                        结果导出Excel文件
+                    </button>
+                </form:form>
+            </div>
+        </div>
+    </div>
+    <div style="display:table-cell;width: 40px"></div>
+    <div style="display:table-cell">
+        <div class="panel panel-info" style="width: 100%;">
+            <div class="panel-heading">
+                <h3 class="panel-title">搜索周报：</h3>
+            </div>
+            <div class="panel-body">
+                <h4>1. 如果选择部门日报，就不必填写责任人</h4>
+                <h4>2. 周报日期是提交周报所在星期</h4>
+                <div class="input-group input-group-md">
+                <span class="input-group-addon" style="width: 100px;text-align: left">
+                    <i>搜索类型：</i>
+                </span>
+                    <select class="form-control" id="weekly_search_type" style="width: 320px">
+                        <option>个人周报</option>
+                        <option>部门周报</option>
+                    </select>
+                </div>
+                <div class="input-group input-group-md">
+                <span class="input-group-addon" style="width: 100px;text-align: left">
+                    <i>周报日期：</i>
+                </span>
+                    <input class="form-control" id="weekly_date" type="date" style="width: 320px;text-align: right"/>
+                </div>
+                <div class="input-group input-group-md">
+                <span class="input-group-addon" style="width: 100px;text-align: left">
+                    <i>责任人：</i>
+                </span>
+                    <input class="form-control" style="width: 215px;" id="weekly_user"/>
+                    <span class="input-group-addon" style="width: 100px;">@hipad.com</span>
+                </div>
+                <div class="input-group input-group-md" id="weekly_search_department_div" style="display: none">
+                <span class="input-group-addon" style="width: 100px;text-align: left">
+                    <i>搜索部门：</i>
+                </span>
+                    <select class="form-control" id="weekly_search_department" style="width: 320px">
+                        <option>app</option>
+                        <option>framework</option>
+                        <option>protocol</option>
+                        <option>driver</option>
+                    </select>
                 </div>
                 <br>
-
-                <button type="submit" class="btn btn-success btn-block" id="search" onclick="search()">查询
+                <button type="submit" class="btn btn-success btn-block" onclick="search_weekly()">查询</button>
+                <button type="button" class="btn btn-default btn-block" id="download_weekly"
+                        onclick="download_weekly()">
+                    结果导出Excel文件
                 </button>
-                <button type="button" class="btn btn-default btn-block" id="download" onclick="download()">结果导出Excel文件
-                </button>
-            </form:form>
+            </div>
         </div>
     </div>
     <br>
@@ -197,6 +253,19 @@
             </ul>
         </nav>
     </div>
+    <div id="weekly_div" style="display: none">
+        <h3>搜索结果：</h3>
+        <table class="AutoNewline" id="weekly_result" border="1" cellpadding="5" cellspacing="0">
+            <tr>
+                <th style="width: 120px;text-align: center">项目</th>
+                <th style="width: 600px;text-align: center">本周工作内容</th>
+                <th style="width: 100px;text-align: center">工时</th>
+                <th style="width: 350px;text-align: center">下周工作安排</th>
+                <th style="width: 350px;text-align: center">疑难问题</th>
+            </tr>
+        </table>
+        <br>
+    </div>
 
     <p id="none_result" style="display: none">查询无结果!</p>
 </div>
@@ -214,12 +283,14 @@
     }
 
     document.getElementById("download").disabled = "disabled";
+    document.getElementById('download_weekly').disabled = "disabled";
 
     $.get('get_current_name', {"user": user}, function (ret) {
         if (ret["permission"]) {
             document.getElementById("statistics").style.display = "";
             document.getElementById("settings").style.display = "";
             document.getElementById("statistics_weekly").style.display = "";
+            document.getElementById("weekly_search_department_div").style.display = "";
         }
     });
 
@@ -227,6 +298,7 @@
     var last_page_btn = document.getElementById("last_page");
     var next_page_btn = document.getElementById("next_page");
     var pages_lable = document.getElementById("pages_lable");
+    var weekly_div = document.getElementById('weekly_div');
 
     var total_pages = 0;
     var current_page = 1;
@@ -252,6 +324,8 @@
 
 
     function search() {
+        document.getElementById("result_div").style.display = "";
+        document.getElementById("weekly_div").style.display = "none";
         total_pages = 0;
         current_page = 1;
         var project = document.getElementById("project").value;
@@ -314,6 +388,77 @@
                 document.getElementById("download").disabled = "disabled";
             }
         })
+    }
+
+    function search_weekly() {
+        document.getElementById("result_div").style.display = "none";
+        $("#weekly_result  tr:not(:first)").html("");
+        if (document.getElementById("weekly_search_type").value === "部门周报") {
+            var type = 1;
+            var person = "";
+        } else {
+            var type = 0;
+            var person = document.getElementById("weekly_user").value;
+            if (person === "") {
+                alert("个人周报必须填写待搜索人信息！")
+                return
+            }
+            person = person + "@hipad.com"
+        }
+        var date = document.getElementById("weekly_date").value;
+
+        if (date === "") {
+            alert("日期不能为空！")
+            return
+        }
+        if (document.getElementById("weekly_search_department_div").style.display === "none") {
+            var search_team = team;
+        } else {
+            var search_team = document.getElementById("weekly_search_department").value;
+        }
+        $.get('search_weekly', {
+            "type": type,
+            "date": date,
+            "person": person,
+            "search_team": search_team
+        }, function (ret) {
+            if (Number(ret) === 0) {
+                document.getElementById("none_result").style.display = "";
+                document.getElementById("weekly_div").style.display = "none";
+                document.getElementById("download_weekly").disabled = "disabled";
+            } else {
+                document.getElementById("none_result").style.display = "none";
+                document.getElementById("weekly_div").style.display = "";
+                document.getElementById("download_weekly").disabled = "";
+                show_weekly_result(ret);
+            }
+        })
+
+        console.log(JSON.stringify({"type": type, "date": date, "person": person, "search_team": search_team}))
+    }
+
+    function show_weekly_result(ret) {
+        var weekly_table = document.getElementById('weekly_result')
+        for (var i = 0; i < ret.length; i++) {
+            var line = document.createElement("tr");
+            var project = document.createElement('td');
+            var info = document.createElement("td");
+            var time = document.createElement("td");
+            var next = document.createElement("td");
+            var difficult = document.createElement("td");
+            project.innerText = ret[i].project;
+            info.innerText = ret[i].info;
+            time.innerText = ret[i].time;
+            next.innerText = ret[i].next_week;
+            difficult.innerText = ret[i].difficult;
+            line.appendChild(project);
+            line.appendChild(info);
+            line.appendChild(time);
+            line.appendChild(next);
+            line.appendChild(difficult);
+            weekly_table.appendChild(line);
+        }
+        weekly_div.appendChild(weekly_table)
     }
 
     function show_result(ret) {
@@ -382,6 +527,95 @@
 
     function download() {
         window.location.href = "download_search"
+    }
+
+    function download_weekly() {
+        var result_total = collect_cells();
+        var result = [];
+        for (var i = 0; i < result_total.length; i++) {
+            var temp = [];
+            temp.push(result_total[i].project);
+            temp.push(result_total[i].info);
+            temp.push(result_total[i].time);
+            temp.push(result_total[i].next_week);
+            temp.push(result_total[i].difficult);
+            result.push(temp)
+        }
+        console.log(result);
+
+        var url = 'download_weekly';
+        var formData = new FormData();
+        formData.append('team', team);
+        formData.append('data', JSON.stringify(result));
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', url, true);    // 也可以使用POST方式，根据接口
+        xhr.responseType = "blob";  // 返回类型blob
+        // 定义请求完成的处理函数，请求前也可以增加加载框/禁用下载按钮逻辑
+        xhr.onload = function () {
+            // 请求完成
+            if (this.status === 200) {
+                // 返回200
+                var blob = this.response;
+                var reader = new FileReader();
+                reader.readAsDataURL(blob);  // 转换为base64，可以直接放入a表情href
+                reader.onload = function (e) {
+                    // 转换完成，创建一个a标签用于下载
+                    var a = document.createElement('a');
+                    a.download = "search-weekly-" + getNowFormatDate() + ".xlsx";
+                    a.href = e.target.result;
+                    $("body").append(a);  // 修复firefox中无法触发click
+                    a.click();
+                    $(a).remove();
+                }
+            }
+        };
+        // 发送ajax请求
+        xhr.send(formData);
+    }
+
+    function collect_cells() {
+        var total = [];
+        var weekly = document.getElementById('weekly_result');
+        for (var i = 1; i < weekly.rows.length; i++) {
+            var result = {
+                project: "",
+                info: "",
+                time: 0,
+                next_week: "",
+                difficult: ""
+            };
+
+            try {
+                result.project = weekly.rows[i].cells[0].firstElementChild.value;
+                result.info = weekly.rows[i].cells[1].firstElementChild.value;
+                result.time = weekly.rows[i].cells[2].firstElementChild.value;
+                result.next_week = weekly.rows[i].cells[3].firstElementChild.value;
+                result.difficult = weekly.rows[i].cells[4].firstElementChild.value;
+            } catch (e) {
+                result.project = weekly.rows[i].cells[0].innerText;
+                result.info = weekly.rows[i].cells[1].innerText;
+                result.time = weekly.rows[i].cells[2].innerText;
+                result.next_week = weekly.rows[i].cells[3].innerText;
+                result.difficult = weekly.rows[i].cells[4].innerText;
+            }
+            total.push(result);
+        }
+        return total;
+    }
+
+    function getNowFormatDate() {
+        var date = new Date();
+        var seperator1 = "/";
+        var year = date.getFullYear();
+        var month = date.getMonth() + 1;
+        var strDate = date.getDate();
+        if (month >= 1 && month <= 9) {
+            month = "0" + month;
+        }
+        if (strDate >= 0 && strDate <= 9) {
+            strDate = "0" + strDate;
+        }
+        return year + seperator1 + month + seperator1 + strDate;
     }
 
     function logout() {

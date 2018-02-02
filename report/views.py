@@ -524,3 +524,28 @@ def download_weekly(request):
     team = request.POST["team"]
     data = json.loads(request.POST["data"])
     return excel.write_weekly_to_excel(data, team)
+
+
+def search_weekly(request):
+    search_type = request.GET['type']
+    date = request.GET['date']
+    person = request.GET['person']
+    team = request.GET['search_team']
+
+    weekly = TeamUtils.get_team_weekly(team)
+
+    try:
+        if int(search_type) == 0:
+            result = weekly.objects.filter(
+                date__week=datetime.datetime.strptime(date, "%Y-%m-%d").isocalendar()[1]).filter(email=person).filter(
+                total=False)
+        elif int(search_type) == 1:
+            result = weekly.objects.filter(
+                date__week=datetime.datetime.strptime(date, "%Y-%m-%d").isocalendar()[1]).filter(total=True)
+        if result.exists() is False:
+            return HttpResponse(0)
+
+    except weekly.DoesNotExist:
+        return HttpResponse(-1)
+
+    return JsonResponse(list(result.values()), safe=False)
