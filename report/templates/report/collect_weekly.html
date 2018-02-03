@@ -73,7 +73,7 @@
                 <div id="unbilled_div">
                     <h4>以下人员未发周报：</h4>
                     <b id="unbilled_user" style="font-size: 18px"></b>
-                    <hr align=center width=300 color=#987cb9 SIZE=1>
+                    <hr>
                 </div>
                 <h4 id="already_num"></h4>
                 <h4 id="total_time"></h4>
@@ -149,7 +149,7 @@
                         show_weekly(ret['data'][i].project, ret['data'][i].info, ret['data'][i].time, ret['data'][i].next_week, ret['data'][i].difficult);
                         total_time += ret['data'][i].time;
                     }
-                    document.getElementById('total_time').innerText = "当前总工时：" + total_time;
+                    document.getElementById('total_time').innerText = "当前总工时：" + total_time.toFixed(2);
                     var line = document.createElement("tr");
                     var leave = document.createElement('td');
                     leave.innerText = "离职人员";
@@ -200,7 +200,7 @@
                 show_weekly(ret[i].project, ret[i].info, ret[i].time, ret[i].next_week, ret[i].difficult);
                 total_time += Number(ret[i].time);
             }
-            document.getElementById('total_time').innerText = "当前总工时：" + total_time;
+            document.getElementById('total_time').innerText = "当前总工时：" + total_time.toFixed(2);
         }
     });
 
