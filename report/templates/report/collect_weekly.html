@@ -64,25 +64,43 @@
 </nav>
 
 <div style="padding: 20px">
-    <div id="collect_user" class="panel panel-danger" style="width: 50%">
-        <div class="panel-heading">
-            <h3 class="panel-title">以下人员未发周报：</h3>
-        </div>
-        <div class="panel-body">
-            <p id="unbilled_user" style="font-size: 18px"></p>
+    <div id="collect_tool" style="display:table-cell;width: 1000px">
+        <div class="panel panel-danger" style="width: 100%">
+            <div class="panel-heading">
+                <h3 class="panel-title">统计工具：</h3>
+            </div>
+            <div class="panel-body">
+                <div id="unbilled_div">
+                    <h4>以下人员未发周报：</h4>
+                    <b id="unbilled_user" style="font-size: 18px"></b>
+                    <hr align=center width=300 color=#987cb9 SIZE=1>
+                </div>
+                <h4 id="already_num"></h4>
+                <h4 id="total_time"></h4>
+                <form name="cal_form">
+                    工时计算器：<input id="cal_num" style="width: 50px"> 人数
+                    * <input id="cal_time" style="width: 50px"> 每天工时
+                    <input type="button" value=" = " onclick="cal()">
+                    <input id="cal_result" style="width: 50px">
+                </form>
+            </div>
         </div>
     </div>
-    <div class="panel panel-danger" style="width: 50%">
-        <div class="panel-heading">
-            <h3 class="panel-title">使用说明：</h3>
-        </div>
-        <div class="panel-body">
-            <p id="unbilled_user" style="font-size: 18px"></p>
-            <h4>1. 在修改前确保组内人员已经全部提交周报</h4>
-            <h4>2. 某项无信息时，保持输入框为空</h4>
-            <h4>3. 修改完成后，点击保存即生成本组周报，此时如果组员又新提了周报将无法统计进去，只能点击重新统计</h4>
+    <div style="display:table-cell;width: 40px"></div>
+    <div style="display:table-cell;width: 500px">
+        <div class="panel panel-danger" style="width: 100%">
+            <div class="panel-heading">
+                <h3 class="panel-title">使用说明：</h3>
+            </div>
+            <div class="panel-body">
+                <p style="font-size: 18px"></p>
+                <h4>1. 在修改前确保组内人员已经全部提交周报</h4>
+                <h4>2. 某项无信息时，保持输入框为空</h4>
+                <h4>3. 修改完成后，点击保存即生成本组周报，此时如果组员又新提了周报将无法统计进去，只能点击重新统计</h4>
+            </div>
         </div>
     </div>
+
     <div id="collect_weekly_div" style="display: none">
         <table class="AutoNewline" id="weekly" border="1" cellpadding="10">
             <tr>
@@ -115,18 +133,23 @@
     var old = [];
 
     var weekly = document.getElementById("weekly");
-    var collect_user = document.getElementById("collect_user");
     var collect_weekly_div = document.getElementById("collect_weekly_div");
     $.get('get_weekly_total', {'team': team}, function (ret) {
+        console.log(ret);
         if (Number(ret) === 0) {
-            collect_user.style.display = "";
+            document.getElementById('unbilled_div').style.display = '';
+            // 未提交正式周报，汇总组员周报
             $.get('collect_weekly', {"team": team}, function (ret) {
+                document.getElementById("already_num").style.display = '';
+                document.getElementById("already_num").innerText = "当前已提交周报人数：" + ret['num'];
                 if (ret != 0) {
                     collect_weekly_div.style.display = "";
+                    var total_time = 0;
                     for (var i = 0; i < ret['data'].length; i++) {
                         show_weekly(ret['data'][i].project, ret['data'][i].info, ret['data'][i].time, ret['data'][i].next_week, ret['data'][i].difficult);
+                        total_time += ret['data'][i].time;
                     }
-
+                    document.getElementById('total_time').innerText = "当前总工时：" + total_time;
                     var line = document.createElement("tr");
                     var leave = document.createElement('td');
                     leave.innerText = "离职人员";
@@ -147,12 +170,17 @@
                     document.getElementById("unbilled_user").innerText = ret.name.join(", ");
                 } else {
                     collect_weekly_div.style.display = "none";
+                    document.getElementById("already_num").innerText = "当前已提交周报人数：0";
+
                     document.getElementById("unbilled_user").innerText = "目前全部未发周报！";
                 }
             });
         } else {
-            collect_user.style.display = "none";
+            // 已提交正式周报，提供修改操作
             collect_weekly_div.style.display = "";
+            document.getElementById('unbilled_div').style.display = 'none';
+            document.getElementById("already_num").style.display = 'none';
+            var total_time = 0;
             for (var i = 0; i < ret.length; i++) {
                 var old_info = {
                     id: "",
@@ -170,7 +198,9 @@
                 old_info.difficult = ret[i].difficult;
                 old.push(old_info);
                 show_weekly(ret[i].project, ret[i].info, ret[i].time, ret[i].next_week, ret[i].difficult);
+                total_time += Number(ret[i].time);
             }
+            document.getElementById('total_time').innerText = "当前总工时：" + total_time;
         }
     });
 
@@ -223,6 +253,7 @@
         var result_total = collect_cells();
 
         if (old.length === 0) {
+            // 当原始内容长度为0，无正式周报，添加内容为插入操作
             $.post('save_weekly_total', {
                 'user': user,
                 'team': team,
@@ -235,6 +266,7 @@
                 }
             });
         } else {
+            // 有原始内容为正式周报，进行修改操作
             var result_new_total = [];
             for (var j = 0; j < result_total.length; j++) {
                 if (result_total[j].project === old[j].project
@@ -375,6 +407,17 @@
             }
         });
     }
+
+    function cal() {
+        var num = document.getElementById('cal_num').value;
+        var time = document.getElementById('cal_time').value;
+        if (num === "" || time === "") {
+            alert("请输入完全！");
+            return
+        }
+        document.getElementById("cal_result").value = Number(num) * Number(time);
+    }
+
     function logout() {
         $.get('logout');
         window.location.href = 'login';

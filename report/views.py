@@ -474,7 +474,7 @@ def collect_weekly(request):
     except weekly.DoesNotExist:
         return HttpResponse(-1)
     return JsonResponse({'data': result,
-                         'name': ret_list}, safe=False)
+                         'name': ret_list, 'num': (len(team_user) - len(ret_list))}, safe=False)
 
 
 @csrf_exempt
