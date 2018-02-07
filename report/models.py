@@ -18,6 +18,11 @@ class User(models.Model):
     def __str__(self):
         return self.email
 
+    def is_manager(self):
+        if self.team.name == "director":
+            return True
+        return False
+
 
 class Project(models.Model):
     name = models.CharField(max_length=200, blank=True)

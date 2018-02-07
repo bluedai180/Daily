@@ -7,6 +7,7 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from datetime import timedelta
+from itertools import chain
 
 from report.app.excel import Excel
 from report.app.team import TeamUtils
@@ -29,9 +30,11 @@ def logout(request):
 
 def get_projects(request):
     team = request.GET['team']
-
     try:
-        projects = Project.objects.filter(team__name=team)
+        if team == "director":
+            projects = Project.objects.all().values('name').distinct()
+        else:
+            projects = Project.objects.filter(team__name=team)
     except Project.DoesNotExist:
         return HttpResponse(-1)
     return JsonResponse(list(projects.values('id', 'name')), safe=False)
@@ -46,7 +49,10 @@ def check_user(request):
     except User.DoesNotExist:
         return HttpResponse(-1)
     if user.pwd == pwd:
-        response = HttpResponse(0)
+        if user.is_manager():
+            response = HttpResponse(1)
+        else:
+            response = HttpResponse(0)
         if is_remember == "true":
             response.set_cookie('user', id, max_age=60 * 60 * 24 * 30)
             response.set_cookie('team', user.team.name, max_age=60 * 60 * 24 * 30)
@@ -60,6 +66,10 @@ def check_user(request):
 
 def edit(request):
     return render(request, 'report/edit.html')
+
+
+def manage(request):
+    return render(request, 'report/manage.html')
 
 
 def get_current_name(request):
@@ -196,6 +206,10 @@ def search(request):
     return render(request, 'report/search.html')
 
 
+def manage_search(request):
+    return render(request, 'report/manage_search.html')
+
+
 paginator = None
 
 
@@ -203,7 +217,7 @@ def search_info(request):
     global paginator
     list_info_result.clear()
     info = json.loads(request.GET['data'])
-    daily = TeamUtils.get_team_daily(info['team'])
+    team = info['team']
     project = info['project']
     worktype = info['worktype']
     bugid = info['bugid']
@@ -213,7 +227,46 @@ def search_info(request):
     start_date = info['start_date']
     end_date = info['end_date']
     user = info['user']
-    result = daily.objects
+
+    if team != "director":
+        daily = TeamUtils.get_team_daily(team)
+        result = daily.objects
+    else:
+        if user == "":
+            daily = TeamUtils.get_team_daily(team)
+            data = []
+            for x in daily:
+                result = x.objects
+                if project != "":
+                    result = result.filter(project=project)
+                if worktype != "":
+                    result = result.filter(work_type=worktype)
+                if bugid != "":
+                    result = result.filter(bugid__icontains=bugid)
+                if describe != "":
+                    result = result.filter(describe__icontains=describe)
+                if solution != "":
+                    result = result.filter(solution=solution)
+                if solution_reason != "":
+                    result = result.filter(solution_reason=solution_reason)
+                if start_date != "" and end_date != "":
+                    result = result.filter(date__range=(start_date, end_date))
+                if result.count() != 0:
+                    data.extend(list(result.values()))
+                    for y in result.values_list():
+                        list_info_result.append(list(y)[1:-1])
+
+            paginator = Paginator(data, 20)
+            if len(data) == 0:
+                return HttpResponse(0)
+            return JsonResponse({"data": paginator.page(1).object_list, "pages": paginator.num_pages},
+                                safe=False)
+
+        else:
+            daily = TeamUtils.get_team_daily(User.objects.get(email=user + "@hipad.com").team.name)
+            result = daily.objects
+            result = result.filter(email=user + "@hipad.com")
+
     if project != "":
         result = result.filter(project=project)
     if worktype != "":
@@ -360,6 +413,11 @@ def get_permission(request):
 
 
 def get_weekly_saved(request):
+    """
+    获取组员已保存的周报
+    :param request:
+    :return:
+    """
     user = request.GET['user']
     team = request.GET['team']
     try:
@@ -374,6 +432,11 @@ def get_weekly_saved(request):
 
 
 def get_weekly(request):
+    """
+    获取指定组员，指定日期范围的日报汇总
+    :param request:
+    :return:
+    """
     user = request.GET['user']
     start = request.GET['start']
     end = request.GET['end']
@@ -398,6 +461,11 @@ def get_weekly(request):
 
 @csrf_exempt
 def save_weekly(request):
+    """
+    组员保存各自周报信息
+    :param request:
+    :return:
+    """
     user = request.POST['user']
     team = request.POST['team']
     data = json.loads(request.POST['data'])
@@ -437,6 +505,11 @@ def statistics_weekly(request):
 
 
 def collect_weekly(request):
+    """
+    获取指定部门所有成员的周报，进行汇总
+    :param request:
+    :return:
+    """
     team = request.GET['team']
     try:
         weekly = TeamUtils.get_team_weekly(team)
@@ -515,7 +588,12 @@ def save_weekly_total(request):
     return HttpResponse(0)
 
 
-def get_weekly_total(request):
+def get_weekly_official(request):
+    """
+    获取指定部门的正式周报
+    :param request:
+    :return:
+    """
     team = request.GET['team']
     weekly = TeamUtils.get_team_weekly(team)
 
@@ -559,3 +637,29 @@ def search_weekly(request):
         return HttpResponse(-1)
 
     return JsonResponse(list(result.values()), safe=False)
+
+
+def get_daily_total(request):
+    user = request.GET['user']
+    team = request.GET['team']
+    daily = TeamUtils.get_team_daily(team)
+    data = {}
+    for x in daily:
+        info = x.objects.filter(date=timezone.now().date())
+        data[str(x.__name__)] = list(info.values())
+
+    return JsonResponse(data, safe=False)
+
+
+def manage_weekly(request):
+    return render(request, 'report/manage_weekly.html')
+
+
+def get_weekly_total(request):
+    team = request.GET['team']
+    weekly = TeamUtils.get_team_weekly(team)
+    data = {}
+    for x in weekly:
+        info = x.objects.filter(date__week=datetime.datetime.now().isocalendar()[1]).filter(total=True)
+        data[str(x.__name__)] = list(info.values())
+    return JsonResponse(data, safe=False)

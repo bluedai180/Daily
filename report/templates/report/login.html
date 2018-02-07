@@ -82,7 +82,12 @@
     "use strict";
     try {
         document.cookie.match(/(^| )user=([^;]*)(;|$)/)[2].replace('"', '').replace('"', '');
-        window.location.href = 'edit';
+        var team = document.cookie.match(/(^| )team=([^;]*)(;|$)/)[2];
+        if (team === "director") {
+            window.location.href = 'manage';
+        } else {
+            window.location.href = 'edit';
+        }
     } catch (e) {
         document.getElementById("login").style.visibility = "visible";
     }
@@ -97,8 +102,11 @@
             "pwd": input_pwd.value,
             "remember": remember
         }, function (ret) {
-            if (ret == 0) {
+            console.log(ret);
+            if (Number(ret) === 0) {
                 window.location.href = "edit";
+            } else if (Number(ret) === 1) {
+                window.location.href = "manage";
             } else {
                 alert("登陆失败！");
             }

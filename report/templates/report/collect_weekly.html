@@ -134,7 +134,7 @@
 
     var weekly = document.getElementById("weekly");
     var collect_weekly_div = document.getElementById("collect_weekly_div");
-    $.get('get_weekly_total', {'team': team}, function (ret) {
+    $.get('get_weekly_official', {'team': team}, function (ret) {
         console.log(ret);
         if (Number(ret) === 0) {
             document.getElementById('unbilled_div').style.display = '';

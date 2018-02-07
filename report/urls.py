@@ -33,8 +33,13 @@ urlpatterns = [
     path('statistics_weekly', views.statistics_weekly, name='statistics_weekly'),
     path('collect_weekly', views.collect_weekly, name='collect_weekly'),
     path('save_weekly_total', views.save_weekly_total, name='save_weekly_total'),
-    path('get_weekly_total', views.get_weekly_total, name='get_weekly_total'),
+    path('get_weekly_official', views.get_weekly_official, name='get_weekly_official'),
     path('download_weekly', views.download_weekly, name='download_weekly'),
     path('get_permission', views.get_permission, name='get_permission'),
-    path('search_weekly', views.search_weekly, name='search_weekly')
+    path('search_weekly', views.search_weekly, name='search_weekly'),
+    path('manage', views.manage, name='manage'),
+    path('get_daily_total', views.get_daily_total, name='get_daily_total'),
+    path('manage_weekly', views.manage_weekly, name='manage_weekly'),
+    path('get_weekly_total', views.get_weekly_total, name='get_weekly_total'),
+    path('manage_search', views.manage_search, name='manage_search')
 ]

@@ -16,6 +16,8 @@ class TeamUtils:
             return DriverDaily
         elif user == "protocol":
             return ProtocolDaily
+        elif user == "director":
+            return [AppDaily, DriverDaily, FrameworkDaily, ProtocolDaily]
 
     @staticmethod
     def get_team_weekly(user):
@@ -27,3 +29,5 @@ class TeamUtils:
             return DriverWeekly
         elif user == "protocol":
             return ProtocolWeekly
+        elif user == "director":
+            return [AppWeekly, DriverWeekly, FrameworkWeekly, ProtocolWeekly]

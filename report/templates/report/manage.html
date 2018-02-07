@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Daily</title>
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="http://cdn.bootcss.com/blueimp-md5/1.1.0/js/md5.js"></script>
+    <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+<nav class="navbar navbar-default" role="navigation" style="background: #0593D3">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" style="color: aliceblue;font-size: 23px;font-weight: bold">日报统计工具</a>
+        </div>
+        <div>
+            <ul class="nav navbar-nav">
+                <li style="background: #0482BA"><a href="manage" style="color: aliceblue;font-size: 20px">汇总日报</a></li>
+                <li><a href="manage_weekly" style="color: aliceblue;font-size: 18px">汇总周报</a></li>
+                <li id="manage_search"><a href="manage_search" style="color: aliceblue;font-size: 18px">搜索</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <p id="show_name" class="navbar-text" style="color: aliceblue;font-size: 15px"></p>
+                <li><a href="#" onclick="logout()" style="color: aliceblue;font-size: 18px"><span
+                        class="glyphicon glyphicon-log-out"></span> 登出</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<style type="text/css">
+    .AutoNewline {
+        Word-break: break-all;
+    }
+</style>
+
+<style>
+    table {
+
+    }
+
+    th {
+        height: 30px;
+        font-size: 16px;
+        background-color: #D9EDF7;
+        padding: 3px;
+    }
+
+    td {
+        height: 60px;
+        font-size: 18px;
+        padding: 3px;
+    }
+
+    hr {
+        border: 0;
+        border-bottom: 1px solid black;
+    }
+</style>
+
+<div style="padding: 20px">
+    <h4 id="today_title"></h4>
+    <h3>应用：</h3>
+    <br><h4 id="none_app_div">无数据。</h4>
+    <div id="collect_app_div" style="display: none">
+        <table class="AutoNewline" id="collection_app" border="1" cellpadding="10" cellspacing="0">
+            <tr>
+                <th style="width: 140px;text-align: center">项目</th>
+                <th style="width: 130px;text-align: center">工作类型</th>
+                <th style="width: 100px;text-align: center">Bug ID</th>
+                <th style="width: 400px;text-align: center">简要描述</th>
+                <th style="width: 60px;text-align: center">优先级</th>
+                <th style="width: 100px;text-align: center">是否reopen</th>
+                <th style="width: 200px;text-align: center">reopen原因</th>
+                <th style="width: 130px;text-align: center">解决方案</th>
+                <th style="width: 100px;text-align: center">原因</th>
+                <th style="width: 70px;text-align: center">责任人</th>
+                <th style="width: 100px;text-align: center">日期</th>
+                <th style="width: 350px;text-align: center">备注</th>
+            </tr>
+        </table>
+        <br><br>
+        <button id="download" onclick="download_app()" type="button" class="btn">导出成Excel文件</button>
+    </div>
+    <hr>
+    <br>
+    <h3>驱动：</h3>
+    <br><h4 id="none_driver_div">无数据。</h4>
+    <div id="collect_driver_div" style="display: none">
+        <table class="AutoNewline" id="collection_driver" border="1" cellpadding="10" cellspacing="0">
+            <tr>
+                <th style="width: 140px;text-align: center">项目</th>
+                <th style="width: 130px;text-align: center">工作类型</th>
+                <th style="width: 100px;text-align: center">Bug ID</th>
+                <th style="width: 400px;text-align: center">简要描述</th>
+                <th style="width: 60px;text-align: center">优先级</th>
+                <th style="width: 100px;text-align: center">是否reopen</th>
+                <th style="width: 200px;text-align: center">reopen原因</th>
+                <th style="width: 130px;text-align: center">解决方案</th>
+                <th style="width: 100px;text-align: center">原因</th>
+                <th style="width: 70px;text-align: center">责任人</th>
+                <th style="width: 100px;text-align: center">日期</th>
+                <th style="width: 350px;text-align: center">备注</th>
+            </tr>
+        </table>
+        <br><br>
+        <button id="download" onclick="download_driver()" type="button" class="btn">导出成Excel文件</button>
+    </div>
+    <hr>
+    <br>
+    <h3>framework：</h3>
+    <br><h4 id="none_fw_div">无数据。</h4>
+    <div id="collect_fw_div" style="display: none">
+        <table class="AutoNewline" id="collection_fw" border="1" cellpadding="10" cellspacing="0">
+            <tr>
+                <th style="width: 140px;text-align: center">项目</th>
+                <th style="width: 130px;text-align: center">工作类型</th>
+                <th style="width: 100px;text-align: center">Bug ID</th>
+                <th style="width: 400px;text-align: center">简要描述</th>
+                <th style="width: 60px;text-align: center">优先级</th>
+                <th style="width: 100px;text-align: center">是否reopen</th>
+                <th style="width: 200px;text-align: center">reopen原因</th>
+                <th style="width: 130px;text-align: center">解决方案</th>
+                <th style="width: 100px;text-align: center">原因</th>
+                <th style="width: 70px;text-align: center">责任人</th>
+                <th style="width: 100px;text-align: center">日期</th>
+                <th style="width: 350px;text-align: center">备注</th>
+            </tr>
+        </table>
+        <br><br>
+        <button id="download" onclick="download_fw()" type="button" class="btn">导出成Excel文件</button>
+    </div>
+    <hr>
+    <br>
+    <h3>协议：</h3>
+    <br><h4 id="none_protocol_div">无数据。</h4>
+    <div id="collect_protocol_div" style="display: none">
+        <table class="AutoNewline" id="collection_protocol" border="1" cellpadding="10" cellspacing="0">
+            <tr>
+                <th style="width: 140px;text-align: center">项目</th>
+                <th style="width: 130px;text-align: center">工作类型</th>
+                <th style="width: 100px;text-align: center">Bug ID</th>
+                <th style="width: 400px;text-align: center">简要描述</th>
+                <th style="width: 60px;text-align: center">优先级</th>
+                <th style="width: 100px;text-align: center">是否reopen</th>
+                <th style="width: 200px;text-align: center">reopen原因</th>
+                <th style="width: 130px;text-align: center">解决方案</th>
+                <th style="width: 100px;text-align: center">原因</th>
+                <th style="width: 70px;text-align: center">责任人</th>
+                <th style="width: 100px;text-align: center">日期</th>
+                <th style="width: 350px;text-align: center">备注</th>
+            </tr>
+        </table>
+        <br><br>
+        <button id="download" onclick="download_protocol()" type="button" class="btn">导出成Excel文件</button>
+    </div>
+
+
+</div>
+
+<script>
+    "use strict";
+    // 禁止后退到登录界面，退出登录只能通过“登出用户”按钮
+    history.pushState(null, null, document.URL);
+    window.addEventListener('popstate', function () {
+        history.pushState(null, null, document.URL);
+    });
+
+    try {
+        var user = document.cookie.match(/(^| )user=([^;]*)(;|$)/)[2].replace('"', '').replace('"', '');
+        var team = document.cookie.match(/(^| )team=([^;]*)(;|$)/)[2];
+        document.getElementById("show_name").innerText = user;
+    } catch (e) {
+        alert("请先登录!");
+        window.location.href = 'login';
+    }
+
+    var today_date = getNowFormatDate();
+    document.getElementById("today_title").innerText = "今日： " + today_date;
+
+
+    $.get('get_daily_total', {'user': user, 'team': team}, function (ret) {
+        console.log(ret);
+        if (ret.AppDaily.length !== 0) {
+            document.getElementById('none_app_div').style.display = 'none';
+            document.getElementById('collect_app_div').style.display = '';
+            show_daily(document.getElementById('collection_app'), ret.AppDaily);
+        } else {
+            document.getElementById('none_app_div').style.display = '';
+        }
+        if (ret.DriverDaily.length !== 0) {
+            document.getElementById('none_driver_div').style.display = 'none';
+            document.getElementById('collect_driver_div').style.display = '';
+            show_daily(document.getElementById('collection_driver'), ret.DriverDaily);
+        } else {
+            document.getElementById('none_driver_div').style.display = '';
+        }
+        if (ret.FrameworkDaily.length !== 0) {
+            document.getElementById('none_fw_div').style.display = 'none';
+            document.getElementById('collect_fw_div').style.display = '';
+            show_daily(document.getElementById('collection_fw'), ret.FrameworkDaily);
+        } else {
+            document.getElementById('none_fw_div').style.display = '';
+        }
+        if (ret.ProtocolDaily.length !== 0) {
+            document.getElementById('none_protocol_div').style.display = 'none';
+            document.getElementById('collect_protocol_div').style.display = '';
+            show_daily(document.getElementById('collection_protocol'), ret.ProtocolDaily);
+        } else {
+            document.getElementById('none_protocol_div').style.display = '';
+        }
+    });
+
+
+    function show_daily(table, data) {
+        for (var i = 0; i < data.length; i++) {
+            var line = document.createElement("tr");
+            var cell_project = document.createElement("td");
+            var cell_work_type = document.createElement("td");
+            var cell_bugid = document.createElement("td");
+            var cell_describe = document.createElement("td");
+            var cell_priority = document.createElement("td");
+            var cell_reopen = document.createElement("td");
+            var cell_reopen_reason = document.createElement("td");
+            var cell_solution = document.createElement("td");
+            var cell_solution_reason = document.createElement("td");
+            var cell_person = document.createElement("td");
+            var cell_date = document.createElement("td");
+            var cell_remake = document.createElement("td");
+            cell_project.innerText = data[i].project;
+            cell_work_type.innerText = data[i].work_type;
+            cell_bugid.innerText = data[i].bugid;
+            cell_describe.innerText = data[i].describe;
+            cell_priority.innerText = data[i].priority;
+            cell_reopen.innerText = data[i].reopen;
+            cell_reopen_reason.innerText = data[i].reopen_reason;
+            cell_solution.innerText = data[i].solution;
+            cell_solution_reason.innerText = data[i].solution_reason;
+            cell_person.innerText = data[i].person;
+            cell_date.innerText = data[i].date;
+            cell_remake.innerText = data[i].remake;
+            line.appendChild(cell_project);
+            line.appendChild(cell_work_type);
+            line.appendChild(cell_bugid);
+            line.appendChild(cell_describe);
+            line.appendChild(cell_priority);
+            line.appendChild(cell_reopen);
+            line.appendChild(cell_reopen_reason);
+            line.appendChild(cell_solution);
+            line.appendChild(cell_solution_reason);
+            line.appendChild(cell_person);
+            line.appendChild(cell_date);
+            line.appendChild(cell_remake);
+            table.appendChild(line);
+        }
+    }
+
+
+    function getNowFormatDate() {
+        var date = new Date();
+        var seperator1 = "-";
+        var year = date.getFullYear();
+        var month = date.getMonth() + 1;
+        var strDate = date.getDate();
+        if (month >= 1 && month <= 9) {
+            month = "0" + month;
+        }
+        if (strDate >= 0 && strDate <= 9) {
+            strDate = "0" + strDate;
+        }
+        return year + seperator1 + month + seperator1 + strDate;
+    }
+
+    function logout() {
+        $.get('logout');
+        window.location.href = 'login';
+    }
+
+    function download_app() {
+        var today = document.getElementById('collection_app');
+        var today_data = [];
+        for (var i = 1; i < today.rows.length; i++) {
+            for (var j = 0; j < today.rows[0].cells.length; j++) {
+                if (!today_data[i]) {
+                    today_data[i] = [];
+                }
+                today_data[i][j] = today.rows[i].cells[j].innerText;
+            }
+        }
+        today_data.shift();
+        download('app', today_data);
+    }
+
+    function download_driver() {
+        var today = document.getElementById('collection_driver');
+        var today_data = [];
+        for (var i = 1; i < today.rows.length; i++) {
+            for (var j = 0; j < today.rows[0].cells.length; j++) {
+                if (!today_data[i]) {
+                    today_data[i] = [];
+                }
+                today_data[i][j] = today.rows[i].cells[j].innerText;
+            }
+        }
+        today_data.shift();
+        download('driver', today_data);
+    }
+    function download_fw() {
+        var today = document.getElementById('collection_fw');
+        var today_data = [];
+        for (var i = 1; i < today.rows.length; i++) {
+            for (var j = 0; j < today.rows[0].cells.length; j++) {
+                if (!today_data[i]) {
+                    today_data[i] = [];
+                }
+                today_data[i][j] = today.rows[i].cells[j].innerText;
+            }
+        }
+        today_data.shift();
+        download('fw', today_data);
+    }
+    function download_protocol() {
+        var today = document.getElementById('collection_protocol');
+        var today_data = [];
+        for (var i = 1; i < today.rows.length; i++) {
+            for (var j = 0; j < today.rows[0].cells.length; j++) {
+                if (!today_data[i]) {
+                    today_data[i] = [];
+                }
+                today_data[i][j] = today.rows[i].cells[j].innerText;
+            }
+        }
+        today_data.shift();
+        download('protocol', today_data);
+    }
+
+    function download(team_name, data) {
+        var url = 'download';
+        var formData = new FormData();
+        formData.append('team', team_name);
+        formData.append('data', JSON.stringify(data));
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', url, true);    // 也可以使用POST方式，根据接口
+        xhr.responseType = "blob";  // 返回类型blob
+        // 定义请求完成的处理函数，请求前也可以增加加载框/禁用下载按钮逻辑
+        xhr.onload = function () {
+            // 请求完成
+            if (this.status === 200) {
+                // 返回200
+                var blob = this.response;
+                var reader = new FileReader();
+                reader.readAsDataURL(blob);  // 转换为base64，可以直接放入a表情href
+                reader.onload = function (e) {
+                    // 转换完成，创建一个a标签用于下载
+                    var a = document.createElement('a');
+                    a.download = team_name + "-daily-" + getNowFormatDate() + ".xlsx";
+                    a.href = e.target.result;
+                    $("body").append(a);  // 修复firefox中无法触发click
+                    a.click();
+                    $(a).remove();
+                }
+            }
+        };
+        // 发送ajax请求
+        xhr.send(formData)
+    }
+
+
+</script>
+
+</body>
+</html>
