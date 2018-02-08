@@ -251,7 +251,7 @@ def search_info(request):
                     result = result.filter(solution_reason=solution_reason)
                 if start_date != "" and end_date != "":
                     result = result.filter(date__range=(start_date, end_date))
-                if result.count() != 0:
+                if result.exists():
                     data.extend(list(result.values()))
                     for y in result.values_list():
                         list_info_result.append(list(y)[1:-1])
@@ -284,20 +284,20 @@ def search_info(request):
     if user != "":
         result = result.filter(email=user + "@hipad.com")
 
-    paginator = Paginator(result, 20)
+    paginator = Paginator(list(result.values()), 20)
     for x in result.values_list():
         list_info_result.append(list(x)[1:-1])
 
     if result.count() == 0:
         return HttpResponse(0)
-    return JsonResponse({"data": list(paginator.page(1).object_list.values()), "pages": paginator.num_pages},
+    return JsonResponse({"data": paginator.page(1).object_list, "pages": paginator.num_pages},
                         safe=False)
 
 
 def move_page(request):
     global paginator
     page = request.GET["page"]
-    return JsonResponse(list(paginator.page(page).object_list.values()), safe=False)
+    return JsonResponse(paginator.page(page).object_list, safe=False)
 
 
 def download_search(request):
