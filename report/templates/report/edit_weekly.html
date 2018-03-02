@@ -176,20 +176,36 @@
             }
             var line = document.createElement("tr");
             var leave = document.createElement('td');
-            leave.innerText = "请假";
+            var leave_data = document.createElement('textarea');
+            leave_data.value = "请假";
+            leave_data.style.height = "100%";
+            leave_data.style.width = "100%";
+            leave.appendChild(leave_data);
             line.appendChild(leave);
-            var none = document.createElement('td');
-            line.appendChild(none);
+            var none1 = document.createElement('td');
+            var none1_data = document.createElement('textarea');
+            none1_data.style.height = "100%";
+            none1_data.style.width = "100%";
+            none1.appendChild(none1_data);
+            line.appendChild(none1);
             var leave_time = document.createElement('td');
             var leave_time_data = document.createElement('textarea');
             leave_time_data.style.height = "100%";
             leave_time_data.style.width = "100%";
             leave_time.appendChild(leave_time_data);
-            var none1 = document.createElement('td');
-            var none2 = document.createElement('td');
             line.appendChild(leave_time);
-            line.appendChild(none1);
+            var none2 = document.createElement('td');
+            var none2_data = document.createElement('textarea');
+            none2_data.style.height = "100%";
+            none2_data.style.width = "100%";
+            none2.appendChild(none2_data);
             line.appendChild(none2);
+            var none3 = document.createElement('td');
+            var none3_data = document.createElement('textarea');
+            none3_data.style.height = "100%";
+            none3_data.style.width = "100%";
+            none3.appendChild(none3_data);
+            line.appendChild(none3);
             weekly.appendChild(line);
         })
     }
@@ -284,7 +300,7 @@
                 if (old.info[j] === result.info[j] && old.time[j] === result.time[j] && old.next[j] === result.next_week[j]
                         && old.difficult[j] === result.difficult[j]) {
                     console.log(old.info[j] + " same");
-                    {#                    alert("内容无修改！");#}
+                    alert("内容无修改！");
                 } else {
                     result_new.id.push(old.id[j]);
                     result_new.project.push(result.project[j]);
