@@ -72,10 +72,10 @@ class ProtocolDaily(SoftDaily):
 
 class SoftWeekly(models.Model):
     project = models.CharField(max_length=200, blank=True, null=True)
-    info = models.CharField(max_length=200, blank=True, null=True)
+    info = models.CharField(max_length=2000, blank=True, null=True)
     time = models.CharField(max_length=200, blank=True, null=True)
-    next_week = models.CharField(max_length=200, blank=True, null=True)
-    difficult = models.CharField(max_length=200, blank=True, null=True)
+    next_week = models.CharField(max_length=2000, blank=True, null=True)
+    difficult = models.CharField(max_length=2000, blank=True, null=True)
     date = models.DateField(blank=True, null=True)
     email = models.EmailField()
     total = models.BooleanField(default=False)
