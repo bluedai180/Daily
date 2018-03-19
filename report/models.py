@@ -70,6 +70,10 @@ class ProtocolDaily(SoftDaily):
     pass
 
 
+class SPMDaily(SoftDaily):
+    pass
+
+
 class SoftWeekly(models.Model):
     project = models.CharField(max_length=200, blank=True, null=True)
     info = models.CharField(max_length=2000, blank=True, null=True)
@@ -100,4 +104,8 @@ class FrameworkWeekly(SoftWeekly):
 
 
 class DriverWeekly(SoftWeekly):
+    pass
+
+
+class SPMWeekly(SoftWeekly):
     pass

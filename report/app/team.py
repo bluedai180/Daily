@@ -1,5 +1,5 @@
 from report.models import AppDaily, FrameworkDaily, DriverDaily, ProtocolDaily, AppWeekly, FrameworkWeekly, \
-    DriverWeekly, ProtocolWeekly
+    DriverWeekly, ProtocolWeekly, SPMDaily, SPMWeekly
 
 
 class TeamUtils:
@@ -16,8 +16,10 @@ class TeamUtils:
             return DriverDaily
         elif user == "protocol":
             return ProtocolDaily
+        elif user == "spm":
+            return SPMDaily
         elif user == "director":
-            return [AppDaily, DriverDaily, FrameworkDaily, ProtocolDaily]
+            return [AppDaily, DriverDaily, FrameworkDaily, ProtocolDaily, SPMDaily]
 
     @staticmethod
     def get_team_weekly(user):
@@ -29,5 +31,7 @@ class TeamUtils:
             return DriverWeekly
         elif user == "protocol":
             return ProtocolWeekly
+        elif user == "spm":
+            return SPMWeekly
         elif user == "director":
-            return [AppWeekly, DriverWeekly, FrameworkWeekly, ProtocolWeekly]
+            return [AppWeekly, DriverWeekly, FrameworkWeekly, ProtocolWeekly, SPMWeekly]
