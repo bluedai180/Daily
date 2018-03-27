@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from .models import Team, User, AppDaily, FrameworkDaily, DriverDaily, ProtocolDaily, Project, \
-    AppWeekly, FrameworkWeekly, DriverWeekly, ProtocolWeekly, SPMDaily, SPMWeekly
+    AppWeekly, FrameworkWeekly, DriverWeekly, ProtocolWeekly, SPMDaily, SPMWeekly, App3Daily, App3Weekly
 
 
 class UserAdmin(admin.ModelAdmin):
@@ -29,9 +29,11 @@ admin.site.register(FrameworkDaily, DailyAdmin)
 admin.site.register(DriverDaily, DailyAdmin)
 admin.site.register(ProtocolDaily, DailyAdmin)
 admin.site.register(SPMDaily, DailyAdmin)
+admin.site.register(App3Daily, DailyAdmin)
 
 admin.site.register(AppWeekly, WeeklyAdmin)
 admin.site.register(FrameworkWeekly, WeeklyAdmin)
 admin.site.register(DriverWeekly, WeeklyAdmin)
 admin.site.register(ProtocolWeekly, WeeklyAdmin)
 admin.site.register(SPMWeekly, WeeklyAdmin)
+admin.site.register(App3Weekly, WeeklyAdmin)
