@@ -278,10 +278,7 @@
     document.getElementById('download_weekly').disabled = "disabled";
 
     $.get('get_permission', {"user": user}, function (ret) {
-        if (ret === "True" && team !== "director") {
-            document.getElementById("statistics").style.display = "";
-            document.getElementById("settings").style.display = "";
-            document.getElementById("statistics_weekly").style.display = "";
+        if (ret === "True" && team == "director") {
             document.getElementById("weekly_search_department_div").style.display = "";
         }
     });
