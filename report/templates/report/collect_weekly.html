@@ -209,11 +209,12 @@
         var line = document.createElement("tr");
         var project = document.createElement('td');
         project.style.height = "400px";
+        project.innerText = pro;
         var info = document.createElement("td");
-        var project_data = document.createElement('textarea');
-        project_data.value = pro;
-        project_data.style.height = "100%";
-        project_data.style.width = "100%";
+{#        var project_data = document.createElement('textarea');#}
+{#        project_data.value = pro;#}
+{#        project_data.style.height = "100%";#}
+{#        project_data.style.width = "100%";#}
         var info_data = document.createElement('textarea');
         info_data.value = inf;
         info_data.style.height = "100%";
@@ -239,7 +240,7 @@
         difficult_data.style.height = "100%";
         difficult_data.style.width = "100%";
         difficult.appendChild(difficult_data);
-        project.appendChild(project_data);
+{#        project.appendChild(project_data);#}
         info.appendChild(info_data);
         line.appendChild(project);
         line.appendChild(info);
@@ -318,7 +319,7 @@
             };
 
             try {
-                result.project = weekly.rows[i].cells[0].firstElementChild.value;
+                result.project = weekly.rows[i].cells[0].innerText;
                 result.info = weekly.rows[i].cells[1].firstElementChild.value;
                 result.time = weekly.rows[i].cells[2].firstElementChild.value;
                 result.next_week = weekly.rows[i].cells[3].firstElementChild.value;
