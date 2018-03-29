@@ -113,7 +113,7 @@
         </table>
         <br>
         <input class="btn btn-primary" type="button" onclick="save_modify()" value="保存"><br><br>
-        <input class="btn btn-success" type="button" onclick="download_excel()" value="导出Excel文件"><br><br>
+        <input id="download_excel" class="btn btn-success" type="button" onclick="download_excel()" value="导出Excel文件"><br><br>
         <input class="btn btn-danger" type="button" onclick="reset_weekly()" value="重新统计"><br><br>
     </div>
 </div>
@@ -134,6 +134,7 @@
 
     var weekly = document.getElementById("weekly");
     var collect_weekly_div = document.getElementById("collect_weekly_div");
+    document.getElementById("download_excel").disabled = "disable";
     $.get('get_weekly_official', {'team': team}, function (ret) {
         console.log(ret);
         if (Number(ret) === 0) {
@@ -180,6 +181,7 @@
             collect_weekly_div.style.display = "";
             document.getElementById('unbilled_div').style.display = 'none';
             document.getElementById("already_num").style.display = 'none';
+            document.getElementById("download_excel").disabled = "";
             var total_time = 0;
             for (var i = 0; i < ret.length; i++) {
                 var old_info = {
