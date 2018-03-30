@@ -302,7 +302,7 @@
                 if (old.info[j] === result.info[j] && old.time[j] === result.time[j] && old.next[j] === result.next_week[j]
                         && old.difficult[j] === result.difficult[j]) {
                     console.log(old.info[j] + " same");
-                    alert("内容无修改！");
+{#                    alert("内容无修改！");#}
                 } else {
                     result_new.id.push(old.id[j]);
                     result_new.project.push(result.project[j]);
@@ -313,17 +313,17 @@
                 }
             }
             console.log(result_new);
-{#            $.post('save_weekly', {#}
-{#                'user': user,#}
-{#                'team': team,#}
-{#                'action': 'modify',#}
-{#                data: JSON.stringify(result_new)#}
-{#            }, function (ret) {#}
-{#                if (Number(ret) === 0) {#}
-{#                    window.location.reload();#}
-{#                }#}
-{#                console.log(ret);#}
-{#            })#}
+            $.post('save_weekly', {
+                'user': user,
+                'team': team,
+                'action': 'modify',
+                data: JSON.stringify(result_new)
+            }, function (ret) {
+                if (Number(ret) === 0) {
+                    window.location.reload();
+                }
+                console.log(ret);
+            })
         }
 
     }
