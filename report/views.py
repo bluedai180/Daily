@@ -21,6 +21,7 @@ def login(request):
     return render(request, 'report/login.html')
 
 
+# 10.10.152.66/api/logout
 def logout(request):
     response = HttpResponse(0)
     response.delete_cookie("user")
@@ -28,18 +29,26 @@ def logout(request):
     return response
 
 
+# 10.10.152.66/api/projects
 def get_projects(request):
     team = request.GET['team']
+    total = request.GET['total']
     try:
         if team == "director":
-            projects = Project.objects.all().values('name').distinct()
+            projects = Project.objects.all()
+            return JsonResponse(list(projects.values('id', 'company', 'name')), safe=False)
         else:
-            projects = Project.objects.filter(team__name=team)
+            if total == "true":
+                projects = Project.objects.all()
+                return JsonResponse(list(projects.values('id', 'name', team)), safe=False)
+            else:
+                projects = TeamUtils.get_team_select_projects(team)
+                return JsonResponse(list(projects.values('id', 'name', team)), safe=False)
     except Project.DoesNotExist:
         return HttpResponse(-1)
-    return JsonResponse(list(projects.values('id', 'name')), safe=False)
 
 
+# 10.10.152.66/api/login
 def check_user(request):
     id = request.GET['id']
     pwd = request.GET['pwd']
@@ -72,6 +81,7 @@ def manage(request):
     return render(request, 'report/manage.html')
 
 
+# 10.10.152.66/api/user
 def get_current_name(request):
     user = request.GET['user']
     date = timezone.now().date()
@@ -95,6 +105,7 @@ def get_current_name(request):
     return JsonResponse(user_info)
 
 
+# 10.10.152.66/api/daily
 @csrf_exempt
 def send_daily(request):
     try:
@@ -156,6 +167,7 @@ def statistics(request):
     return render(request, 'report/collect.html')
 
 
+# 10.10.152.66/api/daily/today
 def collect(request):
     team = request.GET['team']
     list_info_today.clear()
@@ -213,6 +225,7 @@ def manage_search(request):
 paginator = None
 
 
+# 10.10.152.66/api/search/daily
 def search_info(request):
     global paginator
     list_info_result.clear()
@@ -329,6 +342,11 @@ def settings(request):
     return render(request, 'report/team_setting.html')
 
 
+def manage_project(request):
+    return render(request, 'report/manage_project.html')
+
+
+# 10.10.152.66/api/user
 def get_team_user(request):
     team = request.GET['team']
 
@@ -341,6 +359,7 @@ def get_team_user(request):
     return JsonResponse(list(users.values()), safe=False)
 
 
+# 10.10.152.66/api/user
 @csrf_exempt
 def insert_user(request):
     user = json.loads(request.POST['data'])
@@ -357,6 +376,7 @@ def insert_user(request):
     return HttpResponse(new_user.id)
 
 
+# 10.10.152.66/api/user
 @csrf_exempt
 def modify_user(request):
     user = json.loads(request.POST['data'])
@@ -375,6 +395,7 @@ def modify_user(request):
     return HttpResponse(0)
 
 
+# 10.10.152.66/api/projects
 @csrf_exempt
 def delete_projects(request):
     ids = json.loads(request.POST['data'])
@@ -386,24 +407,46 @@ def delete_projects(request):
     return HttpResponse(0)
 
 
+# 10.10.152.66/api/projects
 @csrf_exempt
 def insert_project(request):
-    team = request.POST['team']
-    data = request.POST['data']
+    name = request.POST['project']
+    company = request.POST['company']
     try:
         project = Project()
-        project.name = data
-        project.team = Team.objects.get(name=team)
+        project.name = name
+        project.company = company
         project.save()
     except Project.DoesNotExist:
         return HttpResponse(-1)
     return HttpResponse(project.id)
 
 
+@csrf_exempt
+def select_project(request):
+    """
+    每个部门选择项目总表中的项目，作为日报的项目名下拉菜单的选项，此功能面向部长权限
+    :param request:
+    :return:
+    """
+    team = request.POST['team']
+    data = json.loads(request.POST['data'])
+
+    try:
+        for i in range(len(data['id'])):
+            project = Project.objects.get(id=data['id'][i])
+            project.__dict__[team] = data['checked'][i]
+            project.save()
+    except Project.DoesNotExist:
+        return HttpResponse(-1)
+    return HttpResponse(0)
+
+
 def edit_weekly(request):
     return render(request, 'report/edit_weekly.html')
 
 
+# 10.10.152.66/api/user
 def get_permission(request):
     try:
         user = User.objects.get(email=request.GET['user'])
@@ -412,6 +455,7 @@ def get_permission(request):
     return HttpResponse(user.permission)
 
 
+# 10.10.152.66/api/weekly
 def get_weekly_saved(request):
     """
     获取组员已保存的周报
@@ -431,6 +475,7 @@ def get_weekly_saved(request):
     return JsonResponse(list(result.values()), safe=False)
 
 
+# 10.10.152.66/api/daily/<start>/<end>
 def get_weekly(request):
     """
     获取指定组员，指定日期范围的日报汇总
@@ -459,6 +504,7 @@ def get_weekly(request):
     return JsonResponse({"project": project, "info": info}, safe=False)
 
 
+# 10.10.152.66/api/weekly
 @csrf_exempt
 def save_weekly(request):
     """
@@ -504,6 +550,7 @@ def statistics_weekly(request):
     return render(request, 'report/collect_weekly.html')
 
 
+# 10.10.152.66/api/weekly/team
 def collect_weekly(request):
     """
     获取指定部门所有成员的周报，进行汇总
@@ -550,6 +597,7 @@ def collect_weekly(request):
                          'name': ret_list, 'num': (len(team_user) - len(ret_list))}, safe=False)
 
 
+# 10.10.152.66/api/weekly/formal
 @csrf_exempt
 def save_weekly_total(request):
     user = request.POST['user']
@@ -588,6 +636,7 @@ def save_weekly_total(request):
     return HttpResponse(0)
 
 
+# 10.10.152.66/api/weekly/formal
 def get_weekly_official(request):
     """
     获取指定部门的正式周报
@@ -614,6 +663,7 @@ def download_weekly(request):
     return excel.write_weekly_to_excel(data, team)
 
 
+# 10.10.152.66/api/search/weekly
 def search_weekly(request):
     search_type = request.GET['type']
     date = request.GET['date']
@@ -639,13 +689,15 @@ def search_weekly(request):
     return JsonResponse(list(result.values()), safe=False)
 
 
+# 10.10.152.66/api/daily/team
 def get_daily_total(request):
     user = request.GET['user']
     team = request.GET['team']
+    date = request.GET['date']
     daily = TeamUtils.get_team_daily(team)
     data = {}
     for x in daily:
-        info = x.objects.filter(date=timezone.now().date())
+        info = x.objects.filter(date=datetime.datetime.strptime(date, "%Y-%m-%d").date())
         data[str(x.__name__)] = list(info.values())
 
     return JsonResponse(data, safe=False)
@@ -655,6 +707,7 @@ def manage_weekly(request):
     return render(request, 'report/manage_weekly.html')
 
 
+# 10.10.152.66/api/weekly/formal/team
 def get_weekly_total(request):
     team = request.GET['team']
     weekly = TeamUtils.get_team_weekly(team)

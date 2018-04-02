@@ -25,8 +25,14 @@ class User(models.Model):
 
 
 class Project(models.Model):
+    company = models.CharField(max_length=200, blank=True, null=True)
     name = models.CharField(max_length=200, blank=True)
-    team = models.ForeignKey(Team, on_delete=models.CASCADE)
+    app = models.BooleanField(default=False)
+    app3 = models.BooleanField(default=False)
+    framework = models.BooleanField(default=False)
+    driver = models.BooleanField(default=False)
+    protocol = models.BooleanField(default=False)
+    spm = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name

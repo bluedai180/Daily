@@ -225,13 +225,14 @@
 
     var backup = document.getElementById("content_0");
 
-    $.get('get_projects', {"team": team}, function (ret) {
+    $.get('get_projects', {"team": team, "total": false}, function (ret) {
         var projects = document.getElementById("project");
         for (let i = 0; i < ret.length; i++) {
             var y = document.createElement('option');
             y.text = ret[i].name;
             projects.add(y, null);
         }
+        console.log(ret);
         get_current_name();
     });
 

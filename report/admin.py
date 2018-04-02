@@ -14,7 +14,7 @@ class DailyAdmin(admin.ModelAdmin):
 
 
 class ProjectAdmin(admin.ModelAdmin):
-    list_display = ('name', 'team')
+    list_display = ('name', "app", "app3", "framework", "driver", "protocol", "spm")
 
 
 class WeeklyAdmin(admin.ModelAdmin):

@@ -41,5 +41,7 @@ urlpatterns = [
     path('get_daily_total', views.get_daily_total, name='get_daily_total'),
     path('manage_weekly', views.manage_weekly, name='manage_weekly'),
     path('get_weekly_total', views.get_weekly_total, name='get_weekly_total'),
-    path('manage_search', views.manage_search, name='manage_search')
+    path('manage_search', views.manage_search, name='manage_search'),
+    path('select_project', views.select_project, name='select_project'),
+    path('manage_project', views.manage_project, name='manage_project')
 ]

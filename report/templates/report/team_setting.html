@@ -46,7 +46,7 @@
                 <li id="statistics_weekly"><a href="statistics_weekly"
                                               style="color: aliceblue;font-size: 18px">统计周报</a></li>
                 <li id="settings" style="background: #0482BA;"><a href="settings"
-                                                           style="color: aliceblue;font-size: 18px">设置</a></li>
+                                                                  style="color: aliceblue;font-size: 18px">设置</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 <p id="show_name" class="navbar-text" style="color: aliceblue;font-size: 15px"></p>
@@ -137,7 +137,7 @@
                 </tr>
             </table>
             <br>
-            <button type="submit" class="btn btn-success" onclick="modify_project()">确认删除</button>
+            <button type="submit" class="btn btn-success" onclick="modify_project()">确认添加</button>
         </div>
     </div>
     <br>
@@ -151,7 +151,10 @@
         permission: []
     };
 
-    var old_projects = [];
+    var old_projects = {
+        id: [],
+        checked: []
+    };
     try {
         var user = document.cookie.match(/(^| )user=([^;]*)(;|$)/)[2].replace('"', '').replace('"', '');
         var team = document.cookie.match(/(^| )team=([^;]*)(;|$)/)[2];
@@ -309,7 +312,8 @@
         });
     }
 
-    $.get('get_projects', {"team": team}, function (ret) {
+    $.get('get_projects', {"team": team, "total": true}, function (ret) {
+        console.log(ret);
         for (let i = 0; i < ret.length; i++) {
             projects.appendChild(insert_projects(ret[i]));
         }
@@ -319,42 +323,49 @@
         var line = document.createElement("tr");
         var id = document.createElement("td");
         var names = document.createElement("td");
-        var del = document.createElement("td");
-        var btn = document.createElement("input");
-        btn.type = "button";
-        btn.onclick = function () {
-            // delete
-            this.parentNode.parentNode.parentNode.removeChild(this.parentNode.parentNode);
-        };
-        btn.value = "删除";
-        btn.className = "btn btn-danger";
+        var insert = document.createElement("td");
+        var check = document.createElement("input");
+        check.type = "checkbox";
+        check.checked = data[team];
         id.innerText = data.id;
-        old_projects.push(data.id);
+        old_projects.id.push(data.id);
+        old_projects.checked.push(data[team]);
         names.innerText = data.name;
-        del.appendChild(btn);
+        insert.appendChild(check);
         line.appendChild(id);
         line.appendChild(names);
-        line.appendChild(del);
+        line.appendChild(insert);
         return line
     }
 
     function modify_project() {
         var table = document.getElementById('projects');
-        var result = [];
-        var del = [];
+        var result = {
+            id: [],
+            checked: []
+        };
+        var sel = {
+            id: [],
+            checked: []
+        };
         for (var i = 1, rows = table.rows.length; i < rows; i++) {
-            result.push(Number((table.rows[i].cells[0]).innerText));
+            result.id.push(Number((table.rows[i].cells[0]).innerText));
+            result.checked.push(table.rows[i].cells[2].firstChild.checked);
+            {#            result.push(Number((table.rows[i].cells[0]).innerText));#}
         }
-        for (let j = 0; j < old_projects.length; j++) {
-            if (!contains(result, old_projects[j])) {
-                del.push(old_projects[j]);
+        for (let j = 0; j < old_projects.id.length; j++) {
+            if (old_projects.checked[j] !== result.checked[j]) {
+                sel.id.push(old_projects.id[j]);
+                sel.checked.push(result.checked[j])
             }
         }
-        if (del.length === 0) {
+        if (sel.length === 0) {
             alert("无修改！");
             return
         }
-        delete_projects(del);
+        console.log(sel);
+        {#        delete_projects(del);#}
+        select_project(sel)
     }
 
     function delete_projects(data) {
@@ -375,6 +386,12 @@
             if (Number(ret) !== -1) {
                 projects.appendChild(insert_projects({"id": Number(ret), "name": project}));
             }
+        })
+    }
+
+    function select_project(data) {
+        $.post('select_project', {"team": team, "data": JSON.stringify(data)}, function (ret) {
+            console.log(ret)
         })
     }
 

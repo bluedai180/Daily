@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Daily</title>
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="http://cdn.bootcss.com/blueimp-md5/1.1.0/js/md5.js"></script>
+    <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+<style>
+    table {
+
+    }
+
+    th {
+        text-align: center;
+        height: 30px;
+        font-size: 16px;
+        background-color: #D9EDF7;
+        padding: 3px;
+    }
+
+    td {
+        height: 60px;
+        font-size: 18px;
+        padding: 10px;
+    }
+</style>
+<nav class="navbar navbar-default" role="navigation" style="background: #0593D3">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" style="color: aliceblue;font-size: 23px;font-weight: bold">日报统计工具</a>
+        </div>
+        <div>
+            <ul class="nav navbar-nav">
+                <li><a href="manage" style="color: aliceblue;font-size: 20px">汇总日报</a></li>
+                <li><a href="manage_weekly" style="color: aliceblue;font-size: 18px">汇总周报</a></li>
+                <li><a href="manage_search" style="color: aliceblue;font-size: 18px">搜索</a></li>
+                <li id="manage_search" style="background: #0482BA"><a href="manage_project"
+                                                                      style="color: aliceblue;font-size: 18px">项目管理</a>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <p id="show_name" class="navbar-text" style="color: aliceblue;font-size: 15px"></p>
+                <li><a href="#" onclick="logout()" style="color: aliceblue;font-size: 18px"><span
+                        class="glyphicon glyphicon-log-out"></span> 登出</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div style="padding: 20px">
+    <div class="panel panel-default" style="width: 20%">
+        <div class="panel-heading">
+            <h3 class="panel-title" style="font-size: 20px;font-weight: bold">日报项目名管理</h3>
+        </div>
+        <div class="panel-body">
+            <div class="input-group">
+                <input type="text" id="new_company" class="form-control" placeholder="新公司名...">
+                <input type="text" id="new_project" class="form-control" placeholder="新项目名...">
+            </div>
+            <span class="input-group-btn">
+            <button class="btn btn-default" onclick="save_project()" type="button">保存</button>
+        </span>
+            <br><br>
+            <table id="projects" border="1" cellpadding="5" cellspacing="0">
+                <tr>
+                    <th>ID</th>
+                    <th>公司名称</th>
+                    <th>项目名称</th>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    "use strict";
+    try {
+        var user = document.cookie.match(/(^| )user=([^;]*)(;|$)/)[2].replace('"', '').replace('"', '');
+        var team = document.cookie.match(/(^| )team=([^;]*)(;|$)/)[2];
+        document.getElementById("show_name").innerText = user;
+    } catch (e) {
+        alert("请先登录!");
+        window.location.href = 'login';
+    }
+    var projects = document.getElementById("projects");
+
+    $.get('get_projects', {"team": team, "total": true}, function (ret) {
+        console.log(ret);
+        for (let i = 0; i < ret.length; i++) {
+            projects.appendChild(insert_projects(ret[i]));
+        }
+    });
+
+    function insert_projects(data) {
+        var line = document.createElement("tr");
+        var id = document.createElement("td");
+        var company = document.createElement("td");
+        var names = document.createElement("td");
+        id.innerText = data.id;
+        company.innerText = data.company;
+        names.innerText = data.name;
+        line.appendChild(id);
+        line.appendChild(company);
+        line.appendChild(names);
+        return line
+    }
+
+    function save_project() {
+        var company = document.getElementById("new_company").value;
+        var project = document.getElementById("new_project").value;
+        if (project === "") {
+            alert("内容为空!");
+            return
+        }
+        $.post('insert_project', {"team": team, "project": project, "company": company}, function (ret) {
+            if (Number(ret) !== -1) {
+                projects.appendChild(insert_projects({"id": Number(ret), "company": company, "name": project}));
+            }
+        })
+    }
+
+</script>
+
+</body>
+</html>
