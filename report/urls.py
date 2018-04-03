@@ -43,5 +43,6 @@ urlpatterns = [
     path('get_weekly_total', views.get_weekly_total, name='get_weekly_total'),
     path('manage_search', views.manage_search, name='manage_search'),
     path('select_project', views.select_project, name='select_project'),
-    path('manage_project', views.manage_project, name='manage_project')
+    path('manage_project', views.manage_project, name='manage_project'),
+    path('svn_up', views.svn_up, name='svn_up')
 ]

@@ -1,5 +1,6 @@
 import datetime
 import json
+import svn.local
 
 from django.http import HttpResponse, JsonResponse, StreamingHttpResponse
 from django.shortcuts import render
@@ -716,3 +717,14 @@ def get_weekly_total(request):
         info = x.objects.filter(date__week=datetime.datetime.now().isocalendar()[1]).filter(total=True)
         data[str(x.__name__)] = list(info.values())
     return JsonResponse(data, safe=False)
+
+
+def svn_up(request):
+    """
+    临时占用，hipad wiki svn文档库更新
+    :param request:
+    :return:
+    """
+    client = svn.local.LocalClient("/home/daiqingchen/project/wiki/")
+    client.update()
+    return HttpResponse(0)
