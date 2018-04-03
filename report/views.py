@@ -1,6 +1,7 @@
 import datetime
 import json
 import svn.local
+import svn.exception
 
 from django.http import HttpResponse, JsonResponse, StreamingHttpResponse
 from django.shortcuts import render
@@ -726,5 +727,8 @@ def svn_up(request):
     :return:
     """
     client = svn.local.LocalClient("/home/daiqingchen/project/wiki/")
-    client.update()
+    try:
+        client.update()
+    except svn.exception.SvnException:
+        return HttpResponse(-1)
     return HttpResponse(0)
