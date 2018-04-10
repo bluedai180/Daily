@@ -1,73 +1,145 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:form="http://www.w3.org/1999/xhtml">
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Bootstrap Login Form Template</title>
+    <title>Title</title>
     <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="http://cdn.bootcss.com/blueimp-md5/1.1.0/js/md5.js"></script>
     <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
-    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
     <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-
-    <style>
-        body {
-            margin-left: auto;
-            margin-right: auto;
-            margin-TOP: 300PX;
-        }
-
-        /*web background*/
-        .container {
-            display: table;
-            height: 100%;
-        }
-
-        .row {
-            display: table-cell;
-            vertical-align: middle;
-            width: 80%;
-        }
-
-        /* centered columns styles */
-        .row-centered {
-            text-align: center;
-        }
-
-        .col-centered {
-            display: inline-block;
-            float: none;
-            text-align: left;
-            margin-right: -4px;
-        }
-    </style>
 </head>
-<body>
-<!-- Top content -->
-<div class="container">
-    <div class="row row-centered">
-        <div class="well col-md-6 col-centered">
-            <h2>欢迎登录</h2>
-            <form:form action="/login" method="post" role="form">
-                <div class="input-group input-group-md">
-                    <span class="input-group-addon" id="sizing-addon1"><i class="glyphicon glyphicon-user"
-                                                                          aria-hidden="true"></i></span>
-                    <input type="text" class="form-control" id="userid" name="userid" placeholder="请输入用户ID"/>
-                </div>
-                <div class="input-group input-group-md">
-                        <span class="input-group-addon" id="sizing-addon1"><i
-                                class="glyphicon glyphicon-lock"></i></span>
-                    <input type="password" class="form-control" id="password" name="password" placeholder="请输入密码"/>
-                </div>
-                <br/>
-                <button type="submit" class="btn btn-success btn-block">登录</button>
-            </form:form>
+<body style="overflow: scroll; overflow-y: hidden; overflow-x: hidden">
+    <div style="height: 20px"></div>
+    <div class="container">
+        <div class="row">
+
+            <div class="col-md-6 col-md-offset-3">
+                <form class="form-horizontal" enctype="multipart/form-data" role="form" id="testform">
+
+                    <input type="hidden" value="1" id="id" name="id" />
+                    <div class="control-group">
+                        <label for="uname" class="col-md-3 control-label span3">name</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control span3" value="" id="uname" name="uname"
+                                placeholder="name:">
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="pwd" class="col-md-3 control-label span3">pwd:</label>
+                        <div class="col-md-9">
+                            <input type="password" class="form-control span3" value="" id="pwd" name="pwd"
+                                placeholder="pwd:">
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="col-md-3 control-label span3"></label>
+                        <div class="col-md-9">
+                            <img src="" width="100px" height="100px">
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+
+                        <label for="requirement" class="col-md-3 control-label span3">upload</label>
+                        <div class="col-md-9">
+                            <div class="input-group">
+                                <input id="photoCover" class="form-control" readonly type="text">
+                                <label class="input-group-btn">
+                                    <input id="file" type="file" name="file" style="left: -9999px; position: absolute;">
+                                    <span class="btn btn-default">Browse</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="col-md-2 control-label span2"></label>
+                        <div class="col-md-10">
+                            <a class="btn btn-small btn-primary" onclick="saveUser()">way 1</a>
+                            <a class="btn btn-small btn-danger" onclick="saveUser2()">way 2</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
+    <script>
 
+        //html5实现图片预览功能
+        $(function () {
+            $("#file").change(function (e) {
+                var file = e.target.files[0] || e.dataTransfer.files[0];
+                $('#photoCover').val(document.getElementById("file").files[0].name);
+                if (file) {
+                    var reader = new FileReader();
+                    reader.onload = function () {
+                        $("img").attr("src", this.result);
+                    };
 
-</div>
+                    reader.readAsDataURL(file);
+                }
+            });
+        });
+        //方式一 Jquery实现
+        function saveUser2() {
+            var id = $("#id").val().trim();
+            var uname = $("#uname").val().trim();
+            var pwd = $("#pwd").val().trim();
+            var file = document.getElementById("file").files[0];
+            var formData = new FormData();
+            formData.append('id', id);
+            formData.append('uname', uname);
+            formData.append('pwd', pwd);
+            formData.append('file', file);
+
+            $.ajax({
+                url: "http://10.10.152.66/wiki/amWiki/",
+                type: "post",
+                data: formData,
+                contentType: false,
+                processData: false,
+                mimeType: "multipart/form-data",
+                success: function (data) {
+                    console.log(data);
+                },
+                error: function (data) {
+                    console.log(data);
+                }
+            });
+        }
+
+        //方式二  原生ajax实现
+        function saveUser() {
+            var id = $("#id").val().trim();
+            var uname = $("#uname").val().trim();
+            var pwd = $("#pwd").val().trim();
+            var file = document.getElementById("file").files[0];
+
+            //原生ajax实现文件上传
+            var form = new FormData();
+            form.append("uname", uname); // 可以增加表单数据
+            form.append("id", id);
+            form.append("pwd", pwd);
+            if (file) {
+                form.append("file", file);
+            }
+
+            //得到xhr对象
+            var xhr = null;
+            if (XMLHttpRequest) {
+                xhr = new XMLHttpRequest();
+            } else {
+                xhr = new ActiveXObject("Microsoft.XMLHTTP");
+            }
+
+            xhr.open("post", "/home/about", true);//设置提交方式，url，异步提交
+            xhr.onload = function () {
+                var data = xhr.responseText;    //得到返回值
+                alert(data);
+            };
+            xhr.send(form);
+        }
+    </script>
 </body>
 </html>

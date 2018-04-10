@@ -61,6 +61,10 @@
     }
 </style>
 <div style="padding: 20px">
+
+    <input class="form-control" id="date" type="date" style="width: 320px;text-align: right"/>
+    <button type="button" class="btn btn-default" onclick="check()">查看之前周报</button>
+
     <h3>应用：</h3>
     <br><h4 id="none_app_div">无数据。</h4>
     <div id="collect_app_div" style="display: none">
@@ -124,6 +128,38 @@
         <br>
         <button id="download" onclick="download_protocol()" type="button" class="btn">导出成Excel文件</button>
     </div>
+    <hr>
+    <h3>spm：</h3>
+    <br><h4 id="none_spm_div">无数据。</h4>
+    <div id="collect_spm_div" style="display: none">
+        <table class="AutoNewline" id="weekly_spm" border="1" cellpadding="10">
+            <tr>
+                <th style="width: 120px;text-align: center">项目</th>
+                <th style="width: 600px;text-align: center">本周工作内容</th>
+                <th style="width: 100px;text-align: center">工时</th>
+                <th style="width: 350px;text-align: center">下周工作安排</th>
+                <th style="width: 350px;text-align: center">疑难问题</th>
+            </tr>
+        </table>
+        <br>
+        <button id="download" onclick="download_spm()" type="button" class="btn">导出成Excel文件</button>
+    </div>
+    <hr>
+    <h3>应用部三课：</h3>
+    <br><h4 id="none_app3_div">无数据。</h4>
+    <div id="collect_app3_div" style="display: none">
+        <table class="AutoNewline" id="weekly_app3" border="1" cellpadding="10">
+            <tr>
+                <th style="width: 120px;text-align: center">项目</th>
+                <th style="width: 600px;text-align: center">本周工作内容</th>
+                <th style="width: 100px;text-align: center">工时</th>
+                <th style="width: 350px;text-align: center">下周工作安排</th>
+                <th style="width: 350px;text-align: center">疑难问题</th>
+            </tr>
+        </table>
+        <br>
+        <button id="download" onclick="download_app3()" type="button" class="btn">导出成Excel文件</button>
+    </div>
 </div>
 
 <script>
@@ -135,38 +171,65 @@
         alert("请先登录!");
         window.location.href = 'login';
     }
+    var today_date = getNowFormatDate();
+    get_weekly_total(today_date);
 
-    $.get('get_weekly_total', {'user': user, 'team': team}, function (ret) {
-        console.log(ret);
-        if (ret.AppWeekly.length !== 0) {
-            document.getElementById('none_app_div').style.display = 'none';
-            document.getElementById('collect_app_div').style.display = '';
-            show_weekly(document.getElementById('weekly_app'), ret.AppWeekly);
-        } else {
-            document.getElementById('none_app_div').style.display = '';
-        }
-        if (ret.DriverWeekly.length !== 0) {
-            document.getElementById('none_driver_div').style.display = 'none';
-            document.getElementById('collect_driver_div').style.display = '';
-            show_weekly(document.getElementById('weekly_driver'), ret.DriverWeekly);
-        } else {
-            document.getElementById('none_driver_div').style.display = '';
-        }
-        if (ret.FrameworkWeekly.length !== 0) {
-            document.getElementById('none_fw_div').style.display = 'none';
-            document.getElementById('collect_fw_div').style.display = '';
-            show_weekly(document.getElementById('weekly_fw'), ret.FrameworkWeekly);
-        } else {
-            document.getElementById('none_fw_div').style.display = '';
-        }
-        if (ret.ProtocolWeekly.length !== 0) {
-            document.getElementById('none_protocol_div').style.display = 'none';
-            document.getElementById('collect_protocol_div').style.display = '';
-            show_weekly(document.getElementById('weekly_protocol'), ret.ProtocolWeekly);
-        } else {
-            document.getElementById('none_protocol_div').style.display = '';
-        }
-    });
+    function get_weekly_total(date) {
+
+        clear_table(document.getElementById('weekly_app'));
+        clear_table(document.getElementById('weekly_driver'));
+        clear_table(document.getElementById('weekly_fw'));
+        clear_table(document.getElementById('weekly_protocol'));
+        clear_table(document.getElementById('weekly_spm'));
+        clear_table(document.getElementById('weekly_app3'));
+
+        $.get('get_weekly_total', {'user': user, 'team': team, 'date': date}, function (ret) {
+            console.log(ret);
+            if (ret.AppWeekly.length !== 0) {
+                document.getElementById('none_app_div').style.display = 'none';
+                document.getElementById('collect_app_div').style.display = '';
+                show_weekly(document.getElementById('weekly_app'), ret.AppWeekly);
+            } else {
+                document.getElementById('none_app_div').style.display = '';
+            }
+            if (ret.DriverWeekly.length !== 0) {
+                document.getElementById('none_driver_div').style.display = 'none';
+                document.getElementById('collect_driver_div').style.display = '';
+                show_weekly(document.getElementById('weekly_driver'), ret.DriverWeekly);
+            } else {
+                document.getElementById('none_driver_div').style.display = '';
+            }
+            if (ret.FrameworkWeekly.length !== 0) {
+                document.getElementById('none_fw_div').style.display = 'none';
+                document.getElementById('collect_fw_div').style.display = '';
+                show_weekly(document.getElementById('weekly_fw'), ret.FrameworkWeekly);
+            } else {
+                document.getElementById('none_fw_div').style.display = '';
+            }
+            if (ret.ProtocolWeekly.length !== 0) {
+                document.getElementById('none_protocol_div').style.display = 'none';
+                document.getElementById('collect_protocol_div').style.display = '';
+                show_weekly(document.getElementById('weekly_protocol'), ret.ProtocolWeekly);
+            } else {
+                document.getElementById('none_protocol_div').style.display = '';
+            }
+            if (ret.SPMWeekly.length !== 0) {
+                document.getElementById('none_spm_div').style.display = 'none';
+                document.getElementById('collect_spm_div').style.display = '';
+                show_weekly(document.getElementById('weekly_spm'), ret.SPMWeekly);
+            } else {
+                document.getElementById('none_spm_div').style.display = '';
+            }
+            if (ret.App3Weekly.length !== 0) {
+                document.getElementById('none_app3_div').style.display = 'none';
+                document.getElementById('collect_app3_div').style.display = '';
+                show_weekly(document.getElementById('weekly_app3'), ret.App3Weekly);
+            } else {
+                document.getElementById('none_app3_div').style.display = '';
+            }
+        });
+    }
+
 
     function show_weekly(table, data) {
         for (var i = 0; i < data.length; i++) {
@@ -188,6 +251,20 @@
             line.appendChild(cell_difficult);
             table.appendChild(line);
         }
+    }
+
+    function clear_table(table) {
+        var rowNum = table.rows.length;
+        for (var i = 1; i < rowNum; i++) {
+            table.deleteRow(i);
+            rowNum = rowNum - 1;
+            i = i - 1;
+        }
+    }
+
+    function check() {
+        var date = document.getElementById("date").value;
+        get_weekly_total(date);
     }
 
     function download_app() {
@@ -246,6 +323,36 @@
         }
         today_data.shift();
         download('protocol', today_data);
+    }
+
+    function download_spm() {
+        var today = document.getElementById('weekly_spm');
+        var today_data = [];
+        for (var i = 1; i < today.rows.length; i++) {
+            for (var j = 0; j < today.rows[0].cells.length; j++) {
+                if (!today_data[i]) {
+                    today_data[i] = [];
+                }
+                today_data[i][j] = today.rows[i].cells[j].innerText;
+            }
+        }
+        today_data.shift();
+        download('spm', today_data);
+    }
+
+    function download_app3() {
+        var today = document.getElementById('weekly_app3');
+        var today_data = [];
+        for (var i = 1; i < today.rows.length; i++) {
+            for (var j = 0; j < today.rows[0].cells.length; j++) {
+                if (!today_data[i]) {
+                    today_data[i] = [];
+                }
+                today_data[i][j] = today.rows[i].cells[j].innerText;
+            }
+        }
+        today_data.shift();
+        download('app3', today_data);
     }
 
     function download(team_name, data) {

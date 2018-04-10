@@ -712,10 +712,11 @@ def manage_weekly(request):
 # 10.10.152.66/api/weekly/formal/team
 def get_weekly_total(request):
     team = request.GET['team']
+    date = request.GET['date']
     weekly = TeamUtils.get_team_weekly(team)
     data = {}
     for x in weekly:
-        info = x.objects.filter(date__week=datetime.datetime.now().isocalendar()[1]).filter(total=True)
+        info = x.objects.filter(date__week=datetime.datetime.strptime(date, "%Y-%m-%d").date().isocalendar()[1]).filter(total=True)
         data[str(x.__name__)] = list(info.values())
     return JsonResponse(data, safe=False)
 
