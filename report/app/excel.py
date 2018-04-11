@@ -92,6 +92,32 @@ class Excel:
         response['Content-Disposition'] = 'attachment;filename="{0}"'.format(the_file_name)
         return response
 
+    def write_hour_allocation_to_excel(self, data):
+        self.ws_new.page_setup.fitToHeight = 0
+        self.ws_new.page_setup.fitToWidth = 50
+        for x in data:
+            for index, value in enumerate(x):
+                if value == 0:
+                    x[index] = ""
+            self.ws_new.append(x)
+        file_name = "report/temp/" + str(time.time()) + ".xlsx"
+        self.wb_new.save(file_name)
+
+        def file_iterator(file_name):
+            with open(file_name, 'rb') as f:
+                while True:
+                    c = f.read()
+                    if c:
+                        yield c
+                    else:
+                        break
+
+        the_file_name = "hour_allocation-%s.xlsx" % timezone.now().date().strftime("%Y-%m-%d")
+        response = StreamingHttpResponse(file_iterator(file_name))
+        response['Content-Type'] = 'application/octet-stream'
+        response['Content-Disposition'] = 'attachment;filename="{0}"'.format(the_file_name)
+        return response
+
     def format_file(self):
         """将日报excel文件配置样式"""
         self.ws_new.column_dimensions['A'].width = 20

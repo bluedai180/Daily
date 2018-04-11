@@ -76,6 +76,21 @@
             </table>
         </div>
     </div>
+
+    <div class="panel panel-default" style="width: 20%">
+        <div class="panel-heading">
+            <h3 class="panel-title" style="font-size: 20px;font-weight: bold">统计人员在项目的分配</h3>
+        </div>
+        <div class="panel-body">
+            <h4 style="color: red">因为三月份之前的项目名没有统一，所以等到4月末才可使用！</h4>
+            <div class="input-group">
+                <input class="form-control" id="date" type="month" style="width: 320px;text-align: right"/>
+                <input type="text" id="per_total_hour" style="width: 320px;text-align: right" class="form-control" placeholder="每人次月周报总工时...">
+            </div>
+            <span class="input-group-btn">
+            <button class="btn btn-default" onclick="hour_allocation()" type="button">统计</button>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -123,6 +138,55 @@
                 projects.appendChild(insert_projects({"id": Number(ret), "company": company, "name": project}));
             }
         })
+    }
+
+    function hour_allocation() {
+        var date = document.getElementById("date").value;
+        var per_total_hour = document.getElementById("per_total_hour").value;
+
+        var url = 'hour_allocation';
+        var formData = new FormData();
+        formData.append('hour', per_total_hour);
+        formData.append('date', date);
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', url, true);    // 也可以使用POST方式，根据接口
+        xhr.responseType = "blob";  // 返回类型blob
+        // 定义请求完成的处理函数，请求前也可以增加加载框/禁用下载按钮逻辑
+        xhr.onload = function () {
+            // 请求完成
+            if (this.status === 200) {
+                // 返回200
+                var blob = this.response;
+                var reader = new FileReader();
+                reader.readAsDataURL(blob);  // 转换为base64，可以直接放入a表情href
+                reader.onload = function (e) {
+                    // 转换完成，创建一个a标签用于下载
+                    var a = document.createElement('a');
+                    a.download = "hour_allocation-" + getNowFormatDate() + ".xlsx";
+                    a.href = e.target.result;
+                    $("body").append(a);  // 修复firefox中无法触发click
+                    a.click();
+                    $(a).remove();
+                }
+            }
+        };
+        // 发送ajax请求
+        xhr.send(formData);
+    }
+
+    function getNowFormatDate() {
+        var date = new Date();
+        var seperator1 = "-";
+        var year = date.getFullYear();
+        var month = date.getMonth() + 1;
+        var strDate = date.getDate();
+        if (month >= 1 && month <= 9) {
+            month = "0" + month;
+        }
+        if (strDate >= 0 && strDate <= 9) {
+            strDate = "0" + strDate;
+        }
+        return year + seperator1 + month + seperator1 + strDate;
     }
 
 </script>

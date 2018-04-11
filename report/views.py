@@ -716,7 +716,8 @@ def get_weekly_total(request):
     weekly = TeamUtils.get_team_weekly(team)
     data = {}
     for x in weekly:
-        info = x.objects.filter(date__week=datetime.datetime.strptime(date, "%Y-%m-%d").date().isocalendar()[1]).filter(total=True)
+        info = x.objects.filter(date__week=datetime.datetime.strptime(date, "%Y-%m-%d").date().isocalendar()[1]).filter(
+            total=True)
         data[str(x.__name__)] = list(info.values())
     return JsonResponse(data, safe=False)
 
@@ -733,3 +734,38 @@ def svn_up(request):
     except svn.exception.SvnException:
         return HttpResponse(-1)
     return HttpResponse(0)
+
+
+@csrf_exempt
+def hour_allocation(request):
+    """
+    统计所有员工在某月的项目工时分配
+    :param request:
+    :return:
+    """
+    date = request.POST['date']
+    per_total_hour = request.POST['hour']
+    user = User.objects.all().iterator()
+    projects = Project.objects.all()
+    result = []
+    result.append([x.name for x in projects])
+    result[0].insert(0, "")
+    result[0].remove("团队建设")
+    i = 0
+
+    for x in user:
+        if x.team.name != 'director':
+            i += 1
+            temp = [0 for _ in range(projects.count())]
+            temp[0] = x.name
+            result.append(temp)
+            weekly = TeamUtils.get_team_weekly(x.team.name)
+            weekly_result = weekly.objects.filter(email=x.email).filter(date__month=4).filter(total=False).values("project", "time")
+            for y in weekly_result:
+                if y['project'] in result[0]:
+                    index = result[0].index(y['project']) + 1
+                    result[i][index] += float(y['time']) / float(per_total_hour)
+                    result[i][index] = float('%.2f' % result[i][index])
+            result[i].append(float('%.2f' % sum(result[i][1:])))
+    excel = Excel()
+    return excel.write_hour_allocation_to_excel(result)
